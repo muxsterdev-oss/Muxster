@@ -1,13 +1,14 @@
 /** @type {import('next').NextConfig} */
-const isProd = process.env.NODE_ENV === 'production'
+const isProd = process.env.NODE_ENV === 'production';
 
 const nextConfig = {
-  output: 'export',
-  images: {
-    unoptimized: true
+  reactStrictMode: true,
+  experimental: {
+    esmExternals: 'loose', // needed for Wagmi/Viem
   },
+  output: 'export', // static HTML for GitHub Pages
   basePath: isProd ? '/Muxster' : '',
-  assetPrefix: isProd ? '/Muxster/' : ''
-}
+  images: { unoptimized: true },
+};
 
-module.exports = nextConfig
+module.exports = nextConfig;
