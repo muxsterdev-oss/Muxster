@@ -74,7 +74,7 @@
     const RocketIcon = ({ size = 24, className = "" }) => (
       <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-rocket ${className}`}>
         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
-        <path d="m14 14 7-7" />
+        <path d="m14 14l7-7" />
         <path d="m17 11l5 5a2 2 0 0 1 0 2.82l-2.82 2.82a2 2 0 0 1-2.82 0l-5-5" />
         <path d="m5 5 5 5" />
         <path d="m14 14 5 5" />
@@ -166,66 +166,59 @@
     
     // A simple hook to manage state
     function useSocialPlatformState() {
-      const [casts, setCasts] = useState([
-        {
-          id: 1,
-          author: '0x123...abc',
-          content: 'Hello Muxster testnet! This is my first cast. Excited to build here!',
-          timestamp: Date.now() - 3600000,
-          likes: 12,
-          replies: 3
-        },
-        {
-          id: 2,
-          author: '0xdef...xyz',
-          content: 'Muxster is an amazing L1! The dev experience is fantastic. #blockchain #monad',
-          timestamp: Date.now() - 7200000,
-          likes: 25,
-          replies: 5
-        },
-        {
-          id: 3,
-          author: '0x123...abc',
-          content: 'A long post that might need to be summarized by Gemini. It contains some technical details about parallel execution and optimistic finality. This could be useful for other developers who are interested in learning about the Monad architecture and its benefits.',
-          timestamp: Date.now() - 10800000,
-          likes: 5,
-          replies: 1
+      // Load initial state from local storage or use defaults
+      const getInitialState = () => {
+        const storedState = localStorage.getItem('muxsterState');
+        if (storedState) {
+          try {
+            const state = JSON.parse(storedState);
+            state.following = new Set(state.following);
+            return state;
+          } catch (e) {
+            console.error("Failed to parse state from local storage:", e);
+            localStorage.removeItem('muxsterState');
+          }
         }
-      ]);
-      const [newCastContent, setNewCastContent] = useState('');
+        return {
+          casts: [
+            { id: 1, author: '0x123...abc', content: 'Hello Muxster testnet! This is my first cast. Excited to build here!', timestamp: Date.now() - 3600000, likes: 12, replies: 3 },
+            { id: 2, author: '0xdef...xyz', content: 'Muxster is an amazing L1! The dev experience is fantastic. #blockchain #monad', timestamp: Date.now() - 7200000, likes: 25, replies: 5 },
+            { id: 3, author: '0x123...abc', content: 'A long post that might need to be summarized by Gemini. It contains some technical details about parallel execution and optimistic finality. This could be useful for other developers who are interested in learning about the Monad architecture and its benefits.', timestamp: Date.now() - 10800000, likes: 5, replies: 1 }
+          ],
+          newCastContent: '',
+          walletAddress: null,
+          userRole: null,
+          myProfile: null,
+          isProfileSetupComplete: false,
+          projects: [
+            { id: 1, name: 'Monad NFT Project', description: 'A collection of unique pixel art NFTs for the Monad ecosystem.', raised: 50, goal: 100, creator: '0xabc...123' },
+            { id: 2, name: 'DeFi Lending Protocol', description: 'A new decentralized lending and borrowing protocol with low fees.', raised: 150, goal: 200, creator: '0xdef...456' },
+          ],
+          following: new Set(),
+        };
+      };
+
+      const [state, setState] = useState(getInitialState());
       const [isLoading, setIsLoading] = useState(false);
       const [error, setError] = useState(null);
-      const [walletAddress, setWalletAddress] = useState(null);
-      const [userRole, setUserRole] = useState(null);
       const [currentPage, setCurrentPage] = useState('feed');
       const [currentProfileAddress, setCurrentProfileAddress] = useState(null);
-      const [myProfile, setMyProfile] = useState(null);
-      const [isProfileSetupComplete, setIsProfileSetupComplete] = useState(false); // New state to track if profile is set up
-      const [projects, setProjects] = useState([
-        {
-          id: 1,
-          name: 'Monad NFT Project',
-          description: 'A collection of unique pixel art NFTs for the Monad ecosystem.',
-          raised: 50,
-          goal: 100,
-          creator: '0xabc...123',
-        },
-        {
-          id: 2,
-          name: 'DeFi Lending Protocol',
-          description: 'A new decentralized lending and borrowing protocol with low fees.',
-          raised: 150,
-          goal: 200,
-          creator: '0xdef...456',
-        },
-      ]);
       const [showFundingModal, setShowFundingModal] = useState(false);
       const [selectedProject, setSelectedProject] = useState(null);
       const [isAddingProject, setIsAddingProject] = useState(false);
       const [showRegistrationModal, setShowRegistrationModal] = useState(false);
       const [theme, setTheme] = useState('dark');
       const [summaries, setSummaries] = useState({});
-      const [following, setFollowing] = useState(new Set());
+
+      // Save state to local storage on every change
+      useEffect(() => {
+        try {
+          const stateToSave = { ...state, following: Array.from(state.following) };
+          localStorage.setItem('muxsterState', JSON.stringify(stateToSave));
+        } catch (e) {
+          console.error("Failed to save state to local storage:", e);
+        }
+      }, [state]);
 
       const toggleTheme = () => {
         const newTheme = theme === 'dark' ? 'light' : 'dark';
@@ -244,11 +237,14 @@
           await new Promise(resolve => setTimeout(resolve, 1500));
           const mockAddress = '0x43525287f62e847c231785f7f2b1c43b023e120f';
           
-          setWalletAddress(mockAddress);
-          setUserRole(role);
-          setCurrentProfileAddress(mockAddress);
+          setState(prev => ({
+            ...prev,
+            walletAddress: mockAddress,
+            userRole: role,
+            currentProfileAddress: mockAddress,
+            isProfileSetupComplete: false,
+          }));
           setShowRegistrationModal(false);
-          setIsProfileSetupComplete(false); // New users need to set up their profile
         } catch (e) {
           setError('Failed to register. Please try again.');
         } finally {
@@ -258,60 +254,77 @@
 
       const setupProfile = (profileData) => {
         const { displayName, username, bio, profilePic, banner } = profileData;
-        setMyProfile({
-            address: walletAddress,
-            role: userRole,
-            displayName,
-            username,
-            bio,
-            profilePic,
-            banner,
-            followers: 0,
-            following: 0,
-        });
-        setIsProfileSetupComplete(true);
+        setState(prev => ({
+            ...prev,
+            myProfile: {
+                address: prev.walletAddress,
+                role: prev.userRole,
+                displayName,
+                username,
+                bio,
+                profilePic: profilePic || `https://placehold.co/100x100/A78BFA/ffffff?text=${username.slice(0, 2).toUpperCase()}`,
+                banner: banner || `https://placehold.co/600x200/4338CA/ffffff?text=Banner`,
+                followers: 0,
+                following: 0,
+            },
+            isProfileSetupComplete: true,
+        }));
         setCurrentPage('feed');
       };
       
       const disconnectWallet = () => {
-        setWalletAddress(null);
-        setUserRole(null);
-        setMyProfile(null);
-        setCurrentProfileAddress(null);
-        setIsProfileSetupComplete(false);
+        setState(prev => ({
+          ...prev,
+          walletAddress: null,
+          userRole: null,
+          myProfile: null,
+          currentProfileAddress: null,
+          isProfileSetupComplete: false,
+          following: new Set(),
+        }));
         setCurrentPage('feed');
       };
       
       const updateProfile = (updatedProfile) => {
-        setMyProfile(updatedProfile);
+        setState(prev => ({ ...prev, myProfile: updatedProfile }));
       };
       
       const handleFollow = (address) => {
-        const isFollowing = following.has(address);
-        const newFollowing = new Set(following);
-        if (isFollowing) {
-          newFollowing.delete(address);
-        } else {
-          newFollowing.add(address);
-        }
-        setFollowing(newFollowing);
-        // Simulate updating the user profile's follower count
-        setMyProfile(prev => ({
-          ...prev,
-          following: isFollowing ? prev.following - 1 : prev.following + 1
-        }));
+        setState(prev => {
+          const isFollowing = prev.following.has(address);
+          const newFollowing = new Set(prev.following);
+          if (isFollowing) {
+            newFollowing.delete(address);
+          } else {
+            newFollowing.add(address);
+          }
+          return {
+            ...prev,
+            following: newFollowing,
+            myProfile: {
+              ...prev.myProfile,
+              following: isFollowing ? prev.myProfile.following - 1 : prev.myProfile.following + 1
+            }
+          };
+        });
       };
       
       const handleLike = (castId) => {
-        setCasts(prevCasts => prevCasts.map(cast =>
-          cast.id === castId ? { ...cast, likes: cast.likes + 1 } : cast
-        ));
+        setState(prev => ({
+          ...prev,
+          casts: prev.casts.map(cast =>
+            cast.id === castId ? { ...cast, likes: cast.likes + 1 } : cast
+          )
+        }));
       };
       
       const handleReply = (castId) => {
-        setCasts(prevCasts => prevCasts.map(cast =>
-          cast.id === castId ? { ...cast, replies: cast.replies + 1 } : cast
-        ));
+        setState(prev => ({
+          ...prev,
+          casts: prev.casts.map(cast =>
+            cast.id === castId ? { ...cast, replies: cast.replies + 1 } : cast
+          )
+        }));
       };
 
       const publishNewCast = async (content) => {
@@ -321,15 +334,14 @@
         try {
           await new Promise(resolve => setTimeout(resolve, 2000));
           const newCast = {
-            id: casts.length + 1,
-            author: walletAddress,
+            id: state.casts.length + 1,
+            author: state.walletAddress,
             content,
             timestamp: Date.now(),
             likes: 0,
             replies: 0,
           };
-          setCasts([newCast, ...casts]);
-          setNewCastContent('');
+          setState(prev => ({ ...prev, casts: [newCast, ...prev.casts], newCastContent: '' }));
         } catch (e) {
           setError('Failed to publish cast. Please check your wallet and try again.');
           console.error(e);
@@ -344,7 +356,6 @@
         try {
           await new Promise(resolve => setTimeout(resolve, 1000));
           const summaryText = "This is a brief summary generated by a mock LLM. It highlights key points.";
-
           setSummaries(prev => ({ ...prev, [castId]: { status: 'success', text: summaryText } }));
         } catch (e) {
           console.error("Error summarizing cast:", e);
@@ -357,10 +368,10 @@
         setError(null);
         try {
           await new Promise(resolve => setTimeout(resolve, 2000));
-          const updatedProjects = projects.map(proj => 
+          const updatedProjects = state.projects.map(proj => 
             proj.id === projectId ? { ...proj, raised: proj.raised + amount } : proj
           );
-          setProjects(updatedProjects);
+          setState(prev => ({ ...prev, projects: updatedProjects }));
           setShowFundingModal(false);
         } catch (e) {
           setError('Failed to fund project. Please try again.');
@@ -371,25 +382,24 @@
       
       const addProject = (project) => {
         const newProject = {
-          id: projects.length + 1,
+          id: state.projects.length + 1,
           ...project,
           raised: 0,
-          creator: walletAddress,
+          creator: state.walletAddress,
         };
-        setProjects([...projects, newProject]);
+        setState(prev => ({ ...prev, projects: [...prev.projects, newProject] }));
         setIsAddingProject(false);
       };
 
       return {
-        casts,
-        newCastContent,
-        setNewCastContent,
+        ...state,
+        newCastContent: state.newCastContent,
+        setNewCastContent: content => setState(prev => ({...prev, newCastContent: content})),
         isLoading,
+        setIsLoading,
         error,
+        setError,
         publishNewCast,
-        walletAddress,
-        userRole,
-        myProfile,
         startRegistration,
         completeRegistration,
         disconnectWallet,
@@ -398,7 +408,6 @@
         setCurrentPage,
         currentProfileAddress,
         setCurrentProfileAddress,
-        projects,
         fundProject,
         showFundingModal,
         setShowFundingModal,
@@ -412,34 +421,21 @@
         theme,
         toggleTheme,
         summaries,
+        setSummaries,
         summarizeCast,
-        following,
         handleFollow,
         handleLike,
         handleReply,
-        isProfileSetupComplete,
         setupProfile,
       };
     }
 
-    const Cast = ({ id, author, content, timestamp, showProfile, myProfile, summaries, summarizeCast, handleLike, handleReply }) => {
+    const Cast = ({ id, author, content, timestamp, showProfile, myProfile, summaries, summarizeCast, handleLike, handleReply, likes, replies }) => {
       const isMyCast = myProfile && author === myProfile.address;
       const profilePic = isMyCast ? myProfile.profilePic : `https://placehold.co/100x100/${(author.slice(2, 8) + '000000').slice(0, 6)}/ffffff?text=${author.slice(2, 4)}`;
       const authorName = isMyCast ? myProfile.displayName : 'User';
       const authorUsername = isMyCast ? myProfile.username : author.substring(0, 6) + '...';
       const summary = summaries[id];
-      const [localLikes, setLocalLikes] = useState(12); // Mock data for likes
-      const [localReplies, setLocalReplies] = useState(3); // Mock data for replies
-
-      const handleLikeClick = () => {
-        setLocalLikes(localLikes + 1);
-        handleLike(id);
-      };
-
-      const handleReplyClick = () => {
-        setLocalReplies(localReplies + 1);
-        handleReply(id);
-      };
 
       return (
         <div className="flex space-x-4 p-4 border-b border-gray-700 dark:border-gray-300 hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors duration-150">
@@ -482,13 +478,13 @@
               </div>
             )}
             <div className="flex space-x-6 mt-4 text-gray-500 dark:text-gray-500 text-sm">
-              <button onClick={handleLikeClick} className="flex items-center space-x-1 hover:text-red-400 transition-colors duration-150">
+              <button onClick={() => handleLike(id)} className="flex items-center space-x-1 hover:text-red-400 transition-colors duration-150">
                 <HeartIcon />
-                <span>{localLikes}</span>
+                <span>{likes}</span>
               </button>
-              <button onClick={handleReplyClick} className="flex items-center space-x-1 hover:text-cyan-400 transition-colors duration-150">
+              <button onClick={() => handleReply(id)} className="flex items-center space-x-1 hover:text-cyan-400 transition-colors duration-150">
                 <MessageCircleIcon />
-                <span>{localReplies}</span>
+                <span>{replies}</span>
               </button>
               <button className="flex items-center space-x-1 hover:text-emerald-400 transition-colors duration-150">
                 <ShareIcon />
@@ -1132,10 +1128,68 @@
     };
 
     const SettingsPage = ({ disconnectWallet }) => (
-      <div className="p-6">
-        <h2 className="text-2xl font-bold mb-6 text-monad-dark-text dark:text-monad-dark">Settings</h2>
+      <div className="p-6 space-y-6">
+        <h2 className="text-2xl font-bold text-monad-dark-text dark:text-monad-dark">Settings</h2>
+        
+        {/* Notifications Section */}
         <div className="bg-gray-700 dark:bg-gray-200 p-6 rounded-xl shadow-lg">
-          <p className="text-md text-gray-300 dark:text-gray-700 mb-4">Manage your account and preferences.</p>
+          <h3 className="text-xl font-bold mb-4 text-monad-dark-text dark:text-monad-dark">Notifications</h3>
+          <div className="space-y-4 text-gray-300 dark:text-gray-700">
+            <div className="flex items-center justify-between">
+              <span>Push Notifications</span>
+              <label htmlFor="push-toggle" className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="push-toggle" className="sr-only peer" />
+                <div className="w-11 h-6 bg-gray-500 rounded-full peer-checked:bg-monad-purple after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+              </label>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Email Notifications</span>
+              <label htmlFor="email-toggle" className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="email-toggle" className="sr-only peer" />
+                <div className="w-11 h-6 bg-gray-500 rounded-full peer-checked:bg-monad-purple after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Privacy Section */}
+        <div className="bg-gray-700 dark:bg-gray-200 p-6 rounded-xl shadow-lg">
+          <h3 className="text-xl font-bold mb-4 text-monad-dark-text dark:text-monad-dark">Privacy</h3>
+          <div className="space-y-4 text-gray-300 dark:text-gray-700">
+            <div className="flex items-center justify-between">
+              <span>Public Profile</span>
+              <label htmlFor="public-profile-toggle" className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="public-profile-toggle" className="sr-only peer" defaultChecked />
+                <div className="w-11 h-6 bg-gray-500 rounded-full peer-checked:bg-monad-purple after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+              </label>
+            </div>
+            <div className="flex items-center justify-between">
+              <span>Allow DMs from anyone</span>
+              <label htmlFor="dms-toggle" className="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="dms-toggle" className="sr-only peer" />
+                <div className="w-11 h-6 bg-gray-500 rounded-full peer-checked:bg-monad-purple after:absolute after:top-0.5 after:left-[2px] after:bg-white after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:after:translate-x-full"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+
+        {/* Security Section */}
+        <div className="bg-gray-700 dark:bg-gray-200 p-6 rounded-xl shadow-lg">
+          <h3 className="text-xl font-bold mb-4 text-monad-dark-text dark:text-monad-dark">Security</h3>
+          <div className="space-y-4">
+            <button className="w-full py-2 px-4 text-monad-dark-text dark:text-monad-dark font-bold bg-gray-600 dark:bg-gray-400 rounded-full hover:bg-gray-500 dark:hover:bg-gray-500 transition-colors duration-200">
+              Change Password
+            </button>
+            <button className="w-full py-2 px-4 text-monad-dark-text dark:text-monad-dark font-bold bg-gray-600 dark:bg-gray-400 rounded-full hover:bg-gray-500 dark:hover:bg-gray-500 transition-colors duration-200">
+              Enable 2FA
+            </button>
+          </div>
+        </div>
+
+        {/* Danger Zone */}
+        <div className="bg-red-800 dark:bg-red-200 p-6 rounded-xl shadow-lg">
+          <h3 className="text-xl font-bold mb-4 text-white dark:text-red-800">Danger Zone</h3>
+          <p className="text-md text-red-100 dark:text-red-800 mb-4">You can disconnect your wallet here. This will log you out of the application.</p>
           <button
             onClick={disconnectWallet}
             className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors duration-200"
@@ -1158,7 +1212,7 @@
             <>
                 {/* Desktop Sidebar */}
                 <div className="hidden md:flex flex-col w-64 pr-8">
-                    <div className="p-4 flex flex-col space-y-4">
+                    <div className="p-4 flex flex-col space-y-2">
                         <h1 className="text-3xl font-bold text-monad-purple dark:text-monad-blue">Muxster</h1>
                         {navItems.map(item => (
                             <button
@@ -1175,7 +1229,7 @@
                 </div>
 
                 {/* Mobile Bottom Navigation Menu */}
-                <div className="md:hidden fixed bottom-0 left-0 right-0 max-w-2xl mx-auto bg-monad-dark dark:bg-monad-light border-t border-gray-700 dark:border-gray-300 p-2 rounded-t-3xl flex justify-around shadow-2xl z-20">
+                <div className="md:hidden fixed bottom-0 left-0 right-0 mx-auto bg-monad-dark dark:bg-monad-light border-t border-gray-700 dark:border-gray-300 p-2 rounded-t-3xl flex justify-around shadow-2xl z-20">
                     {navItems.map(item => (
                         <button
                             key={item.id}
@@ -1230,12 +1284,17 @@
             <h3 className="text-xl font-bold mb-3 text-monad-dark-text dark:text-monad-dark">Who to Follow</h3>
             <div className="space-y-4">
               {suggestedUsers.map(user => (
-                <div key={user.address} className="flex items-center space-x-3">
-                  <img src={`https://placehold.co/50x50/${(user.address.slice(2, 8) + '000000').slice(0, 6)}/ffffff?text=${user.address.slice(2, 4)}`} alt="User profile" className="w-10 h-10 rounded-full" />
-                  <div>
-                    <p className="font-semibold text-monad-dark-text dark:text-monad-dark">{user.name}</p>
-                    <p className="text-sm text-gray-400 dark:text-gray-600">@{user.address.substring(0, 6)}...</p>
+                <div key={user.address} className="bg-gray-700 dark:bg-gray-200 p-3 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <img src={`https://placehold.co/50x50/${(user.address.slice(2, 8) + '000000').slice(0, 6)}/ffffff?text=${user.address.slice(2, 4)}`} alt="User profile" className="w-10 h-10 rounded-full" />
+                    <div>
+                      <p className="font-semibold text-monad-dark-text dark:text-monad-dark">{user.name}</p>
+                      <p className="text-sm text-gray-400 dark:text-gray-600">@{user.address.substring(0, 6)}...</p>
+                    </div>
                   </div>
+                  <button onClick={() => showProfile(user.address)} className="bg-monad-accent hover:bg-emerald-600 text-monad-dark font-bold py-1 px-3 rounded-full transition-colors duration-200">
+                    View Profile
+                  </button>
                 </div>
               ))}
             </div>
@@ -1386,64 +1445,36 @@
           <div className="flex w-full max-w-7xl">
             {/* Left Sidebar */}
             <div className="hidden md:flex flex-col w-64 pr-8">
-              <div className="p-4 flex flex-col space-y-4">
+              <div className="p-4 flex flex-col space-y-2">
                 <h1 className="text-3xl font-bold text-monad-purple dark:text-monad-blue">Muxster</h1>
-                <button 
-                  onClick={() => setCurrentPage('feed')} 
-                  className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'feed' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-                >
-                  <HomeIcon size={24} />
-                  <span className="text-lg font-medium">Timeline</span>
-                </button>
-                <button 
-                  onClick={() => setCurrentPage('explore')}
-                  className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'explore' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-                >
-                  <SearchIcon size={24} />
-                  <span className="text-lg font-medium">Explore</span>
-                </button>
-                <button 
-                  onClick={() => setCurrentPage('launchpad')} 
-                  className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'launchpad' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-                >
-                  <RocketIcon size={24} />
-                  <span className="text-lg font-medium">Funding</span>
-                </button>
-                <button 
-                  onClick={() => setCurrentPage('notifications')} 
-                  className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'notifications' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-                >
-                  <BellIcon size={24} />
-                  <span className="text-lg font-medium">Notifications</span>
-                </button>
-                <button 
-                  onClick={() => {
-                    if (walletAddress) {
-                      showProfile(walletAddress);
-                    }
-                  }} 
-                  className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'profile' && currentProfileAddress === walletAddress ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-                  disabled={!walletAddress}
-                >
-                  <ProfileIcon size={24} />
-                  <span className="text-lg font-medium">Profile</span>
-                </button>
-                <button 
-                  onClick={() => setCurrentPage('settings')} 
-                  className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'settings' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-                >
-                  <SettingsIcon size={24} />
-                  <span className="text-lg font-medium">Settings</span>
-                </button>
+                {navItems.map(item => (
+                    <button
+                        key={item.id}
+                        onClick={() => {
+                            if (item.id === 'profile') {
+                                if (walletAddress) {
+                                    showProfile(walletAddress);
+                                }
+                            } else {
+                                setCurrentPage(item.id);
+                            }
+                        }}
+                        className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === item.id ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
+                        disabled={item.disabled}
+                    >
+                        <item.icon size={24} />
+                        <span className="text-lg font-medium">{item.label}</span>
+                    </button>
+                ))}
               </div>
             </div>
             
             {/* Main Content Pane */}
-            <div className="w-full sm:max-w-xl lg:max-w-none lg:w-3/5 bg-monad-dark-card dark:bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col relative">
+            <div className="w-full md:w-3/5 lg:w-3/5 bg-monad-dark-card dark:bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col relative">
               {/* Header for both desktop and mobile view */}
               <div className="p-4 sm:p-6 bg-monad-dark dark:bg-monad-light border-b border-gray-700 dark:border-gray-300 flex justify-between items-center z-20">
-                <h1 className="text-2xl sm:text-3xl font-bold text-monad-purple dark:text-monad-blue sm:hidden">Muxster Social</h1>
-                <div className="flex-grow sm:text-3xl sm:font-bold sm:pl-4 text-monad-purple dark:text-monad-blue hidden sm:block">{navItems.find(item => item.id === currentPage)?.label}</div>
+                <h1 className="text-2xl sm:text-3xl font-bold text-monad-purple dark:text-monad-blue md:hidden">Muxster Social</h1>
+                <div className="flex-grow text-3xl font-bold pl-4 text-monad-purple dark:text-monad-blue hidden md:block">{navItems.find(item => item.id === currentPage)?.label}</div>
                 <div className="flex items-center space-x-2">
                   <button
                     onClick={toggleTheme}
@@ -1473,7 +1504,15 @@
                 {navItems.map(item => (
                     <button
                         key={item.id}
-                        onClick={item.id === 'profile' ? () => showProfile(walletAddress) : () => setCurrentPage(item.id)}
+                        onClick={() => {
+                            if (item.id === 'profile') {
+                                if (walletAddress) {
+                                    showProfile(walletAddress);
+                                }
+                            } else {
+                                setCurrentPage(item.id);
+                            }
+                        }}
                         className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === item.id ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
                         disabled={item.disabled}
                     >
