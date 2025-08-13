@@ -1,1 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Monad Social</title>
+  <!-- Tailwind CSS CDN for styling -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- React and ReactDOM CDNs -->
+  <script src="https://unpkg.com/react@18/umd/react.development.js" crossorigin></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
+  <!-- Babel for JSX compilation -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+</head>
+<body class="bg-gray-900 font-sans">
+  <div id="root"></div>
+
+  <!-- The main application code using JSX -->
+  <script type="text/babel">
+    const { useState } = React;
+    const { createRoot } = ReactDOM;
+
+    // Use inline SVGs for icons for a clean look.
+    const ProfileIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-circle">
+        <circle cx="12" cy="12" r="10" />
+        <circle cx="12" cy="10" r="3" />
+        <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+      </svg>
+    );
+
+    const SendIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-send">
+        <path d="m22 2-7 20-4-9-9-4 20-7z" />
+        <path d="M22 2 11 13" />
+      </svg>
+    );
+
+    const HeartIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-heart">
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+      </svg>
+    );
+
+    const MessageCircleIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-message-circle">
+        <path d="M7.9 20A9.3 9.3 0 0 1 4 16.1L2 22l6-2h-2zm12.1-13A9.3 9.3 0 0 1 20 16.1L22 22l-6-2-2-2h2zm-12-13A9.3 9.3 0 0 1 4 8.1L2 14l6-2-2-2h2z" />
+      </svg>
+    );
+
+    const ShareIcon = () => (
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-share-2">
+        <circle cx="18" cy="5" r="3" />
+        <circle cx="6" cy="12" r="3" />
+        <circle cx="18" cy="19" r="3" />
+        <line x1="8.59" x2="15.42" y1="13.51" y2="17.49" />
+        <line x1="15.41" x2="8.59" y1="6.51" y2="10.49" />
+      </svg>
+    );
+
+    // A simple hook to manage state
+    function useSocialPlatformState() {
+      const [casts, setCasts] = useState([
+        {
+          id: 1,
+          author: '0x123...abc',
+          content: 'Hello Monad testnet! This is my first cast. Excited to build here!',
+          timestamp: Date.now() - 3600000,
+          likes: 12,
+          replies: 3,
+        },
+        {
+          id: 2,
+          author: '0xdef...xyz',
+          content: 'Monad is an amazing L1! The dev experience is fantastic. #blockchain #monad',
+          timestamp: Date.now() - 7200000,
+          likes: 25,
+          replies: 5,
+        },
+      ]);
+
+      const [newCastContent, setNewCastContent] = useState('');
+      const [isLoading, setIsLoading] = useState(false);
+      const [error, setError] = useState(null);
+
+      // Function to simulate publishing a new cast
+      const publishNewCast = async (content) => {
+        setIsLoading(true);
+        setError(null);
+
+        try {
+          // Simulate network latency and a successful transaction
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          const newCast = {
+            id: casts.length + 1,
+            author: '0x123...abc', // The current user's address
+            content,
+            timestamp: Date.now(),
+            likes: 0,
+            replies: 0,
+          };
+          setCasts([newCast, ...casts]);
+          setNewCastContent('');
+        } catch (e) {
+          setError('Failed to publish cast. Please check your wallet and try again.');
+          console.error(e);
+        } finally {
+          setIsLoading(false);
+        }
+      };
+
+      return {
+        casts,
+        newCastContent,
+        setNewCastContent,
+        isLoading,
+        error,
+        publishNewCast,
+      };
+    }
+
+    // Component for a single post/cast
+    const Cast = ({ author, content, timestamp, likes, replies }) => (
+      <div className="flex space-x-4 p-4 border-b border-gray-700 hover:bg-gray-800 transition-colors duration-150">
+        <div className="flex-shrink-0">
+          <ProfileIcon className="text-indigo-400" />
+        </div>
+        <div className="flex-grow">
+          <div className="flex justify-between items-center text-sm text-gray-400">
+            <span className="font-semibold text-indigo-400">User <span className="font-mono text-xs text-gray-500">{author}</span></span>
+            <span>{new Date(timestamp).toLocaleString()}</span>
+          </div>
+          <p className="mt-2 text-white leading-relaxed">{content}</p>
+          <div className="flex space-x-6 mt-4 text-gray-500 text-sm">
+            <button className="flex items-center space-x-1 hover:text-red-400 transition-colors duration-150">
+              <HeartIcon />
+              <span>{likes}</span>
+            </button>
+            <button className="flex items-center space-x-1 hover:text-cyan-400 transition-colors duration-150">
+              <MessageCircleIcon />
+              <span>{replies}</span>
+            </button>
+            <button className="flex items-center space-x-1 hover:text-emerald-400 transition-colors duration-150">
+              <ShareIcon />
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+
+    // Main App component
+    const App = () => {
+      const {
+        casts,
+        newCastContent,
+        setNewCastContent,
+        isLoading,
+        error,
+        publishNewCast,
+      } = useSocialPlatformState();
+
+      const handlePublish = (e) => {
+        e.preventDefault();
+        if (newCastContent.trim()) {
+          publishNewCast(newCastContent);
+        }
+      };
+
+      return (
+        <div className="min-h-screen bg-gray-900 text-gray-100 flex justify-center p-4 sm:p-8 font-sans">
+          <div className="w-full max-w-2xl bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
+            {/* Header */}
+            <div className="p-4 sm:p-6 bg-gray-900 border-b border-gray-700 sticky top-0 z-10">
+              <h1 className="text-2xl sm:text-3xl font-bold text-indigo-400">Monad Social</h1>
+              <p className="text-sm text-gray-400 mt-1">A simple Farcaster-style feed on Monad testnet.</p>
+            </div>
+
+            {/* New Cast Input */}
+            <div className="p-4 sm:p-6 border-b border-gray-700">
+              <form onSubmit={handlePublish} className="flex flex-col space-y-4">
+                <textarea
+                  className="w-full p-3 bg-gray-700 text-white rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
+                  rows="3"
+                  placeholder="What's on your mind? (140 characters max)"
+                  value={newCastContent}
+                  onChange={(e) => setNewCastContent(e.target.value)}
+                  maxLength={140}
+                  disabled={isLoading}
+                />
+                <div className="flex justify-between items-center">
+                  <span className="text-sm text-gray-500">{newCastContent.length}/140</span>
+                  <button
+                    type="submit"
+                    className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-full shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    disabled={isLoading || !newCastContent.trim()}
+                  >
+                    {isLoading ? 'Posting...' : (
+                      <>
+                        <span>Cast</span>
+                        <SendIcon />
+                      </>
+                    )}
+                  </button>
+                </div>
+              </form>
+              {error && <p className="text-red-400 text-center mt-4">{error}</p>}
+            </div>
+
+            {/* Casts Feed */}
+            <div className="pb-8">
+              {casts.map((cast) => (
+                <Cast key={cast.id} {...cast} />
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const container = document.getElementById('root');
+    const root = createRoot(container);
+    root.render(<App />);
+
+  </script>
+</body>
+</html>
 
