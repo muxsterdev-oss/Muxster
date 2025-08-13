@@ -4,10 +4,9 @@ import { jsonRpcProvider } from 'wagmi/providers/jsonRpc';
 import { publicProvider } from 'wagmi/providers/public';
 import { MetaMaskConnector } from 'wagmi/connectors/metaMask';
 
-// Fallback RPC for GitHub Pages build
-const fallbackRpc = "https://rpc.monad.xyz"; // Replace with actual public RPC
-
-const rpcUrl = process.env.NEXT_PUBLIC_MONAD_RPC_URL || fallbackRpc;
+// Fallback RPC for build preview (safe default for GitHub Pages)
+const defaultRpcUrl = 'https://rpc.monad.xyz';
+const rpcUrl = process.env.NEXT_PUBLIC_MONAD_RPC_URL || defaultRpcUrl;
 const chainId = parseInt(process.env.NEXT_PUBLIC_CHAIN_ID || '1', 10);
 
 const { chains, publicClient } = configureChains(
@@ -16,13 +15,10 @@ const { chains, publicClient } = configureChains(
       id: chainId,
       name: 'Monad',
       network: 'monad',
-      rpcUrls: { default: { http: [rpcUrl] } },
-    },
+      rpcUrls: { default: { http: [rpcUrl] } }
+    }
   ],
-  [
-    jsonRpcProvider({ rpc: () => ({ http: rpcUrl }) }),
-    publicProvider(),
-  ]
+  [jsonRpcProvider({ rpc: () => ({ http: rpcUrl }) }), publicProvider()]
 );
 
 const config = createConfig({
