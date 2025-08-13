@@ -11,6 +11,16 @@
   <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js" crossorigin></script>
   <!-- Babel for JSX compilation -->
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    body {
+      padding-bottom: 72px; /* Adjust for the bottom nav bar */
+    }
+    @media (min-width: 640px) {
+      body {
+        padding-bottom: 0;
+      }
+    }
+  </style>
 </head>
 <body class="bg-gray-900 font-sans">
   <div id="root"></div>
@@ -21,11 +31,42 @@
     const { createRoot } = ReactDOM;
 
     // Use inline SVGs for icons for a clean look.
-    const ProfileIcon = () => (
-      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-user-circle">
+    const ProfileIcon = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-user-circle ${className}`}>
         <circle cx="12" cy="12" r="10" />
         <circle cx="12" cy="10" r="3" />
         <path d="M7 20.662V19a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v1.662" />
+      </svg>
+    );
+
+    const HomeIcon = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-home ${className}`}>
+        <path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+        <polyline points="9 22 9 12 15 12 15 22" />
+      </svg>
+    );
+    
+    const BellIcon = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-bell ${className}`}>
+        <path d="M6 8a6 6 0 0 1 12 0c0 7-3 9-3 9H9s-3-2-3-9" />
+        <path d="M10.3 21a1.94 1.94 0 0 0 3.4 0" />
+      </svg>
+    );
+    
+    const RocketIcon = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-rocket ${className}`}>
+        <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
+        <path d="m14 14 7-7" />
+        <path d="m17 11 5 5a2 2 0 0 1 0 2.82l-2.82 2.82a2 2 0 0 1-2.82 0l-5-5" />
+        <path d="m5 5 5 5" />
+        <path d="m14 14 5 5" />
+      </svg>
+    );
+
+    const BackIcon = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-arrow-left ${className}`}>
+        <path d="m12 19-7-7 7-7"/>
+        <path d="M19 12H5"/>
       </svg>
     );
 
@@ -38,7 +79,7 @@
 
     const HeartIcon = () => (
       <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-heart">
-        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z" />
       </svg>
     );
 
@@ -78,22 +119,62 @@
           replies: 5,
         },
       ]);
-
       const [newCastContent, setNewCastContent] = useState('');
       const [isLoading, setIsLoading] = useState(false);
       const [error, setError] = useState(null);
+      const [walletAddress, setWalletAddress] = useState(null);
+      const [currentPage, setCurrentPage] = useState('feed');
+      const [projects, setProjects] = useState([
+        {
+          id: 1,
+          name: 'Monad NFT Project',
+          description: 'A collection of unique pixel art NFTs for the Monad ecosystem.',
+          raised: 50,
+          goal: 100,
+          creator: '0xabc...123',
+        },
+        {
+          id: 2,
+          name: 'DeFi Lending Protocol',
+          description: 'A new decentralized lending and borrowing protocol with low fees.',
+          raised: 150,
+          goal: 200,
+          creator: '0xdef...456',
+        },
+      ]);
+      const [showFundingModal, setShowFundingModal] = useState(false);
+      const [selectedProject, setSelectedProject] = useState(null);
+      const [isAddingProject, setIsAddingProject] = useState(false);
 
-      // Function to simulate publishing a new cast
+      const connectWallet = async () => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          await new Promise(resolve => setTimeout(resolve, 1500));
+          const mockAddress = '0x43525287f62e847c231785f7f2b1c43b023e120f';
+          setWalletAddress(mockAddress);
+          setCurrentPage('feed');
+        } catch (e) {
+          setError('Failed to connect wallet. Please try again.');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      const disconnectWallet = () => {
+        setWalletAddress(null);
+        setCurrentPage('feed');
+      };
+
       const publishNewCast = async (content) => {
         setIsLoading(true);
         setError(null);
 
         try {
-          // Simulate network latency and a successful transaction
           await new Promise(resolve => setTimeout(resolve, 2000));
           const newCast = {
             id: casts.length + 1,
-            author: '0x123...abc', // The current user's address
+            author: walletAddress,
             content,
             timestamp: Date.now(),
             likes: 0,
@@ -109,6 +190,35 @@
         }
       };
 
+      const fundProject = async (projectId, amount) => {
+        setIsLoading(true);
+        setError(null);
+        try {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          const updatedProjects = projects.map(proj => 
+            proj.id === projectId ? { ...proj, raised: proj.raised + amount } : proj
+          );
+          setProjects(updatedProjects);
+          setShowFundingModal(false);
+          alert('Funding successful!'); // Use a custom modal in a real app
+        } catch (e) {
+          setError('Failed to fund project. Please try again.');
+        } finally {
+          setIsLoading(false);
+        }
+      };
+      
+      const addProject = (project) => {
+        const newProject = {
+          id: projects.length + 1,
+          ...project,
+          raised: 0,
+          creator: walletAddress,
+        };
+        setProjects([...projects, newProject]);
+        setIsAddingProject(false);
+      };
+
       return {
         casts,
         newCastContent,
@@ -116,18 +226,36 @@
         isLoading,
         error,
         publishNewCast,
+        walletAddress,
+        connectWallet,
+        disconnectWallet,
+        currentPage,
+        setCurrentPage,
+        projects,
+        fundProject,
+        showFundingModal,
+        setShowFundingModal,
+        selectedProject,
+        setSelectedProject,
+        isAddingProject,
+        setIsAddingProject,
+        addProject,
       };
     }
 
-    // Component for a single post/cast
-    const Cast = ({ author, content, timestamp, likes, replies }) => (
+    const Cast = ({ author, content, timestamp, likes, replies, showProfile }) => (
       <div className="flex space-x-4 p-4 border-b border-gray-700 hover:bg-gray-800 transition-colors duration-150">
-        <div className="flex-shrink-0">
-          <ProfileIcon className="text-indigo-400" />
+        <div className="flex-shrink-0 cursor-pointer text-indigo-400 hover:text-indigo-300" onClick={() => showProfile(author)}>
+          <ProfileIcon />
         </div>
         <div className="flex-grow">
           <div className="flex justify-between items-center text-sm text-gray-400">
-            <span className="font-semibold text-indigo-400">User <span className="font-mono text-xs text-gray-500">{author}</span></span>
+            <span 
+              className="font-semibold text-indigo-400 cursor-pointer hover:underline"
+              onClick={() => showProfile(author)}
+            >
+              User <span className="font-mono text-xs text-gray-500">{author.substring(0, 6)}...{author.substring(author.length - 4)}</span>
+            </span>
             <span>{new Date(timestamp).toLocaleString()}</span>
           </div>
           <p className="mt-2 text-white leading-relaxed">{content}</p>
@@ -148,35 +276,41 @@
       </div>
     );
 
-    // Main App component
-    const App = () => {
-      const {
-        casts,
-        newCastContent,
-        setNewCastContent,
-        isLoading,
-        error,
-        publishNewCast,
-      } = useSocialPlatformState();
+    const ProfilePage = ({ address, disconnect }) => (
+      <div className="p-4 sm:p-6 h-full">
+        <div className="flex flex-col items-center p-8 bg-gray-700 rounded-2xl shadow-lg">
+          <ProfileIcon className="text-indigo-400 w-20 h-20 mb-4" />
+          <h2 className="text-2xl font-bold text-white mt-4">User Profile</h2>
+          <p className="text-md text-gray-400 mt-2">Wallet Address:</p>
+          <p className="text-sm font-mono break-all bg-gray-800 p-2 rounded-lg text-emerald-400 mt-1">
+            {address}
+          </p>
+          <button
+            onClick={disconnect}
+            className="mt-6 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-full shadow-lg transition-colors duration-200"
+          >
+            Disconnect Wallet
+          </button>
+        </div>
+      </div>
+    );
 
+    const FeedPage = ({ casts, newCastContent, setNewCastContent, isLoading, error, publishNewCast, walletAddress, setCurrentPage }) => {
       const handlePublish = (e) => {
         e.preventDefault();
         if (newCastContent.trim()) {
           publishNewCast(newCastContent);
         }
       };
+      
+      const showProfile = (address) => {
+        setCurrentPage('profile');
+      };
 
       return (
-        <div className="min-h-screen bg-gray-900 text-gray-100 flex justify-center p-4 sm:p-8 font-sans">
-          <div className="w-full max-w-2xl bg-gray-800 rounded-3xl shadow-2xl overflow-hidden">
-            {/* Header */}
-            <div className="p-4 sm:p-6 bg-gray-900 border-b border-gray-700 sticky top-0 z-10">
-              <h1 className="text-2xl sm:text-3xl font-bold text-indigo-400">Monad Social</h1>
-              <p className="text-sm text-gray-400 mt-1">A simple Farcaster-style feed on Monad testnet.</p>
-            </div>
-
-            {/* New Cast Input */}
-            <div className="p-4 sm:p-6 border-b border-gray-700">
+        <>
+          <div className="p-4 sm:p-6 border-b border-gray-700">
+            {walletAddress ? (
               <form onSubmit={handlePublish} className="flex flex-col space-y-4">
                 <textarea
                   className="w-full p-3 bg-gray-700 text-white rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
@@ -203,14 +337,350 @@
                   </button>
                 </div>
               </form>
-              {error && <p className="text-red-400 text-center mt-4">{error}</p>}
+            ) : (
+              <p className="text-center text-gray-400 py-4">Connect your wallet to start casting!</p>
+            )}
+            {error && <p className="text-red-400 text-center mt-4">{error}</p>}
+          </div>
+
+          <div className="pb-20">
+            {casts.map((cast) => (
+              <Cast key={cast.id} {...cast} showProfile={showProfile} />
+            ))}
+          </div>
+        </>
+      );
+    };
+
+    const NotificationsPage = () => (
+      <div className="p-6 text-center text-gray-400">
+        <BellIcon size={48} className="mx-auto mb-4 text-indigo-400"/>
+        <h2 className="text-2xl font-bold mb-2 text-white">Notifications</h2>
+        <p>This is where your notifications will appear.</p>
+        <p className="mt-2">This feature is coming soon!</p>
+      </div>
+    );
+    
+    // New components for the launchpad
+    const FundingModal = ({ project, onFund, onClose }) => {
+      const [amount, setAmount] = useState(0);
+
+      const handleFund = () => {
+        if (amount > 0) {
+          onFund(project.id, amount);
+        }
+      };
+
+      return (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-sm w-full">
+            <h3 className="text-xl font-bold mb-4 text-white">Fund Project: {project.name}</h3>
+            <p className="text-gray-400 mb-4">
+              Current Goal: {project.raised} / {project.goal} MON
+            </p>
+            <label className="block mb-2 text-gray-300">Amount to fund (MON):</label>
+            <input 
+              type="number"
+              value={amount}
+              onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
+              className="w-full p-2 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            />
+            <div className="flex justify-end space-x-4 mt-6">
+              <button 
+                onClick={onClose}
+                className="py-2 px-4 rounded-full text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleFund}
+                className="py-2 px-4 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50"
+                disabled={amount <= 0}
+              >
+                Fund
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    };
+
+    const ProjectCard = ({ project, onFundClick }) => {
+      const progress = Math.min(100, (project.raised / project.goal) * 100);
+      return (
+        <div className="bg-gray-700 p-4 rounded-xl shadow-lg flex flex-col justify-between">
+          <div>
+            <h3 className="text-xl font-bold text-indigo-400">{project.name}</h3>
+            <p className="text-sm text-gray-400 mt-1">{project.description}</p>
+            <div className="mt-4">
+              <div className="w-full bg-gray-600 rounded-full h-2.5">
+                <div 
+                  className="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" 
+                  style={{ width: `${progress}%` }}
+                ></div>
+              </div>
+              <div className="flex justify-between text-sm mt-2 text-gray-400">
+                <span>Raised: <span className="font-semibold text-white">{project.raised} MON</span></span>
+                <span>Goal: <span className="font-semibold text-white">{project.goal} MON</span></span>
+              </div>
+            </div>
+          </div>
+          <button 
+            onClick={() => onFundClick(project)}
+            className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors duration-200"
+          >
+            Fund Project
+          </button>
+        </div>
+      );
+    };
+
+    const NewProjectForm = ({ addProject, onCancel }) => {
+      const [name, setName] = useState('');
+      const [description, setDescription] = useState('');
+      const [goal, setGoal] = useState('');
+
+      const handleSubmit = (e) => {
+        e.preventDefault();
+        if (name && description && goal) {
+          addProject({ name, description, goal: parseInt(goal) });
+        }
+      };
+
+      return (
+        <div className="p-4 bg-gray-700 rounded-xl shadow-lg mt-6">
+          <h3 className="text-xl font-bold text-white mb-4">Create a New Project</h3>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <input 
+              type="text" 
+              placeholder="Project Name" 
+              value={name} 
+              onChange={(e) => setName(e.target.value)}
+              className="w-full p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+            <textarea
+              placeholder="Project Description"
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
+              className="w-full p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              rows="3"
+              required
+            />
+            <input
+              type="number"
+              placeholder="Funding Goal (MON)"
+              value={goal}
+              onChange={(e) => setGoal(e.target.value)}
+              className="w-full p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              required
+            />
+            <div className="flex justify-end space-x-4">
+              <button 
+                type="button" 
+                onClick={onCancel}
+                className="py-2 px-4 rounded-full text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="py-2 px-4 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200"
+              >
+                Submit Project
+              </button>
+            </div>
+          </form>
+        </div>
+      );
+    };
+
+    const LaunchpadPage = ({ projects, fundProject, walletAddress, isLoading, showFundingModal, setShowFundingModal, selectedProject, setSelectedProject, isAddingProject, setIsAddingProject, addProject }) => {
+      const handleFundClick = (project) => {
+        if (walletAddress) {
+          setSelectedProject(project);
+          setShowFundingModal(true);
+        } else {
+          alert('Please connect your wallet to fund a project.');
+        }
+      };
+
+      return (
+        <div className="p-4 sm:p-6">
+          <h2 className="text-2xl font-bold mb-4 text-white">Community Launchpad</h2>
+          <p className="text-gray-400 mb-6">Support new projects on the Monad testnet!</p>
+          
+          {isAddingProject ? (
+            <NewProjectForm addProject={addProject} onCancel={() => setIsAddingProject(false)} />
+          ) : (
+            <button
+              onClick={() => {
+                if (walletAddress) {
+                  setIsAddingProject(true);
+                } else {
+                  alert('Please connect your wallet to create a new project.');
+                }
+              }}
+              className="w-full mb-6 py-3 px-6 text-white bg-emerald-600 hover:bg-emerald-700 rounded-full font-bold shadow-lg transition-colors duration-200"
+            >
+              Create New Project
+            </button>
+          )}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+            {projects.map(project => (
+              <ProjectCard 
+                key={project.id}
+                project={project}
+                onFundClick={handleFundClick}
+              />
+            ))}
+          </div>
+
+          {showFundingModal && (
+            <FundingModal 
+              project={selectedProject}
+              onFund={fundProject}
+              onClose={() => setShowFundingModal(false)}
+            />
+          )}
+        </div>
+      );
+    };
+
+
+    const App = () => {
+      const {
+        casts,
+        newCastContent,
+        setNewCastContent,
+        isLoading,
+        error,
+        publishNewCast,
+        walletAddress,
+        connectWallet,
+        disconnectWallet,
+        currentPage,
+        setCurrentPage,
+        projects,
+        fundProject,
+        showFundingModal,
+        setShowFundingModal,
+        selectedProject,
+        setSelectedProject,
+        isAddingProject,
+        setIsAddingProject,
+        addProject,
+      } = useSocialPlatformState();
+
+      const renderPage = () => {
+        switch (currentPage) {
+          case 'feed':
+            return (
+              <FeedPage 
+                casts={casts}
+                newCastContent={newCastContent}
+                setNewCastContent={setNewCastContent}
+                isLoading={isLoading}
+                error={error}
+                publishNewCast={publishNewCast}
+                walletAddress={walletAddress}
+                setCurrentPage={setCurrentPage}
+              />
+            );
+          case 'profile':
+            return (
+              <ProfilePage
+                address={walletAddress}
+                disconnect={disconnectWallet}
+                goBack={() => setCurrentPage('feed')}
+              />
+            );
+          case 'notifications':
+            return <NotificationsPage />;
+          case 'launchpad':
+            return (
+              <LaunchpadPage
+                projects={projects}
+                fundProject={fundProject}
+                walletAddress={walletAddress}
+                isLoading={isLoading}
+                showFundingModal={showFundingModal}
+                setShowFundingModal={setShowFundingModal}
+                selectedProject={selectedProject}
+                setSelectedProject={setSelectedProject}
+                isAddingProject={isAddingProject}
+                setIsAddingProject={setIsAddingProject}
+                addProject={addProject}
+              />
+            );
+          default:
+            return <FeedPage 
+                casts={casts}
+                newCastContent={newCastContent}
+                setNewCastContent={setNewCastContent}
+                isLoading={isLoading}
+                error={error}
+                publishNewCast={publishNewCast}
+                walletAddress={walletAddress}
+                setCurrentPage={setCurrentPage}
+              />;
+        }
+      };
+
+      return (
+        <div className="min-h-screen bg-gray-900 text-gray-100 flex justify-center p-4 sm:p-8 font-sans">
+          <div className="w-full max-w-2xl bg-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col relative">
+            {/* Header */}
+            <div className="p-4 sm:p-6 bg-gray-900 border-b border-gray-700 flex justify-between items-center z-20">
+              <h1 className="text-2xl sm:text-3xl font-bold text-indigo-400">Monad Social</h1>
+              {!walletAddress && (
+                <button
+                  onClick={connectWallet}
+                  className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors duration-200"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Connecting...' : 'Connect Wallet'}
+                </button>
+              )}
             </div>
 
-            {/* Casts Feed */}
-            <div className="pb-8">
-              {casts.map((cast) => (
-                <Cast key={cast.id} {...cast} />
-              ))}
+            {/* Main Content Area */}
+            <div className="flex-grow overflow-y-auto pb-16">
+              {renderPage()}
+            </div>
+            
+            {/* Bottom Navigation Menu */}
+            <div className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto bg-gray-900 border-t border-gray-700 p-2 sm:p-4 rounded-t-3xl flex justify-around shadow-2xl z-20">
+              <button 
+                onClick={() => setCurrentPage('feed')} 
+                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'feed' ? 'text-indigo-400 bg-gray-800' : 'text-gray-500 hover:text-indigo-400'}`}
+              >
+                <HomeIcon size={28} />
+                <span className="text-xs font-medium mt-1 hidden sm:block">Timeline</span>
+              </button>
+              <button 
+                onClick={() => setCurrentPage('launchpad')} 
+                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'launchpad' ? 'text-indigo-400 bg-gray-800' : 'text-gray-500 hover:text-indigo-400'}`}
+              >
+                <RocketIcon size={28} />
+                <span className="text-xs font-medium mt-1 hidden sm:block">Launchpad</span>
+              </button>
+              <button 
+                onClick={() => setCurrentPage('notifications')} 
+                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'notifications' ? 'text-indigo-400 bg-gray-800' : 'text-gray-500 hover:text-indigo-400'}`}
+              >
+                <BellIcon size={28} />
+                <span className="text-xs font-medium mt-1 hidden sm:block">Notifications</span>
+              </button>
+              <button 
+                onClick={() => setCurrentPage('profile')} 
+                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'profile' ? 'text-indigo-400 bg-gray-800' : 'text-gray-500 hover:text-indigo-400'}`}
+                disabled={!walletAddress}
+              >
+                <ProfileIcon size={28} />
+                <span className="text-xs font-medium mt-1 hidden sm:block">Profile</span>
+              </button>
             </div>
           </div>
         </div>
@@ -224,4 +694,3 @@
   </script>
 </body>
 </html>
-
