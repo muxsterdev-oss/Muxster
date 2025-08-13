@@ -13,7 +13,7 @@
   <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
   <style>
     body {
-      padding-bottom: 72px; /* Adjust for the bottom nav bar */
+      padding-bottom: 72px; /* Adjust for the bottom nav bar on mobile */
     }
     @media (min-width: 640px) {
       body {
@@ -1040,6 +1040,61 @@
         </div>
       </div>
     );
+    
+    // Main navigation component that is responsive
+    const Navigation = ({ currentPage, setCurrentPage, walletAddress, showProfile, disconnectWallet, toggleTheme, theme, navItems }) => {
+        const handleProfileClick = () => {
+            if (walletAddress) {
+                showProfile(walletAddress);
+            }
+        };
+
+        return (
+            <>
+                {/* Desktop Sidebar */}
+                <div className="hidden sm:flex flex-col w-64 pr-8">
+                    <div className="p-4 flex flex-col space-y-4">
+                        <h1 className="text-3xl font-bold text-monad-purple dark:text-monad-blue">Muxster</h1>
+                        {navItems.map(item => (
+                            <button
+                                key={item.id}
+                                onClick={item.id === 'profile' ? handleProfileClick : () => setCurrentPage(item.id)}
+                                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === item.id ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
+                                disabled={item.disabled}
+                            >
+                                <item.icon size={24} />
+                                <span className="text-lg font-medium">{item.label}</span>
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Mobile Bottom Navigation Menu */}
+                <div className="sm:hidden fixed bottom-0 left-0 right-0 max-w-2xl mx-auto bg-monad-dark dark:bg-monad-light border-t border-gray-700 dark:border-gray-300 p-2 rounded-t-3xl flex justify-around shadow-2xl z-20">
+                    {navItems.map(item => (
+                        <button
+                            key={item.id}
+                            onClick={item.id === 'profile' ? handleProfileClick : () => setCurrentPage(item.id)}
+                            className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === item.id ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
+                            disabled={item.disabled}
+                        >
+                            <item.icon size={28} />
+                            <span className="text-xs font-medium mt-1">{item.label}</span>
+                        </button>
+                    ))}
+                </div>
+            </>
+        );
+    };
+
+    const navItems = [
+      { id: 'feed', icon: HomeIcon, label: 'Timeline' },
+      { id: 'explore', icon: SearchIcon, label: 'Explore' },
+      { id: 'launchpad', icon: RocketIcon, label: 'Launchpad' },
+      { id: 'notifications', icon: BellIcon, label: 'Notifications' },
+      { id: 'profile', icon: ProfileIcon, label: 'Profile', disabled: false },
+      { id: 'settings', icon: SettingsIcon, label: 'Settings' }
+    ];
 
     const App = () => {
       const {
@@ -1086,7 +1141,7 @@
         setCurrentPage('profile');
       };
 
-      const renderPage = () => {
+      const renderPage = (navItems) => {
         switch (currentPage) {
           case 'feed':
             return (
@@ -1166,140 +1221,46 @@
 
       return (
         <div className="flex justify-center p-4 sm:p-8 font-sans bg-monad-dark dark:bg-monad-light min-h-screen">
-          {/* Desktop Sidebar */}
-          <div className="hidden sm:flex flex-col w-64 pr-8">
-            <div className="p-4 flex flex-col space-y-4">
-              <h1 className="text-3xl font-bold text-monad-purple dark:text-monad-blue">Muxster</h1>
-              <button 
-                onClick={() => setCurrentPage('feed')} 
-                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'feed' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-              >
-                <HomeIcon size={24} />
-                <span className="text-lg font-medium">Timeline</span>
-              </button>
-              <button 
-                onClick={() => setCurrentPage('explore')}
-                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'explore' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-              >
-                <SearchIcon size={24} />
-                <span className="text-lg font-medium">Explore</span>
-              </button>
-              <button 
-                onClick={() => setCurrentPage('launchpad')} 
-                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'launchpad' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-              >
-                <RocketIcon size={24} />
-                <span className="text-lg font-medium">Launchpad</span>
-              </button>
-              <button 
-                onClick={() => setCurrentPage('notifications')} 
-                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'notifications' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-              >
-                <BellIcon size={24} />
-                <span className="text-lg font-medium">Notifications</span>
-              </button>
-              <button 
-                onClick={() => {
-                  if (walletAddress) {
-                    showProfile(walletAddress);
-                  }
-                }} 
-                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'profile' && currentProfileAddress === walletAddress ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-                disabled={!walletAddress}
-              >
-                <ProfileIcon size={24} />
-                <span className="text-lg font-medium">Profile</span>
-              </button>
-              <button 
-                onClick={() => setCurrentPage('settings')} 
-                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'settings' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-              >
-                <SettingsIcon size={24} />
-                <span className="text-lg font-medium">Settings</span>
-              </button>
-            </div>
-            <div className="flex-grow"></div>
-            <div className="p-4">
-              <button
-                onClick={toggleTheme}
-                className="w-full flex items-center justify-center p-2 rounded-full text-gray-400 dark:text-gray-600 hover:text-white dark:hover:text-black transition-colors duration-200"
-              >
-                {theme === 'dark' ? <SunIcon size={24} /> : <MoonIcon size={24} />}
-              </button>
-            </div>
-          </div>
+          <Navigation
+              currentPage={currentPage}
+              setCurrentPage={setCurrentPage}
+              walletAddress={walletAddress}
+              showProfile={showProfile}
+              disconnectWallet={disconnectWallet}
+              toggleTheme={toggleTheme}
+              theme={theme}
+              navItems={navItems}
+          />
           
-          {/* Main Content Pane */}
           <div className="w-full sm:max-w-xl bg-monad-dark-card dark:bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col relative">
-            {/* Header for mobile view */}
-            <div className="sm:hidden p-4 sm:p-6 bg-monad-dark dark:bg-monad-light border-b border-gray-700 dark:border-gray-300 flex justify-between items-center z-20">
-              <h1 className="text-2xl sm:text-3xl font-bold text-monad-purple dark:text-monad-blue">Muxster Social</h1>
-              {!walletAddress && (
+            {/* Header for both desktop and mobile view */}
+            <div className="p-4 sm:p-6 bg-monad-dark dark:bg-monad-light border-b border-gray-700 dark:border-gray-300 flex justify-between items-center z-20">
+              <h1 className="text-2xl sm:text-3xl font-bold text-monad-purple dark:text-monad-blue sm:hidden">Muxster Social</h1>
+              <div className="flex-grow sm:text-3xl sm:font-bold sm:pl-4 text-monad-purple dark:text-monad-blue hidden sm:block">{navItems.find(item => item.id === currentPage)?.label}</div>
+              <div className="flex items-center space-x-2">
                 <button
-                  onClick={startRegistration}
-                  className="flex items-center space-x-2 bg-monad-blue hover:bg-monad-purple text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors duration-200"
-                  disabled={isLoading}
+                  onClick={toggleTheme}
+                  className="p-2 rounded-full text-gray-400 dark:text-gray-600 hover:text-white dark:hover:text-black transition-colors duration-200"
                 >
-                  {isLoading ? 'Loading...' : 'Get Started'}
+                  {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
                 </button>
-              )}
+                {!walletAddress && (
+                  <button
+                    onClick={startRegistration}
+                    className="flex items-center space-x-2 bg-monad-blue hover:bg-monad-purple text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors duration-200"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Loading...' : 'Get Started'}
+                  </button>
+                )}
+              </div>
             </div>
 
             {/* Main Content Area */}
             <div className="flex-grow overflow-y-auto pb-16 sm:pb-0">
-              {renderPage()}
+              {renderPage(navItems)}
             </div>
             
-            {/* Mobile Bottom Navigation Menu */}
-            <div className="sm:hidden fixed bottom-0 left-0 right-0 max-w-2xl mx-auto bg-monad-dark dark:bg-monad-light border-t border-gray-700 dark:border-gray-300 p-2 rounded-t-3xl flex justify-around shadow-2xl z-20">
-              <button 
-                onClick={() => setCurrentPage('feed')} 
-                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'feed' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-              >
-                <HomeIcon size={28} />
-                <span className="text-xs font-medium mt-1">Timeline</span>
-              </button>
-              <button 
-                onClick={() => setCurrentPage('explore')}
-                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'explore' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-              >
-                <SearchIcon size={28} />
-                <span className="text-xs font-medium mt-1">Explore</span>
-              </button>
-              <button 
-                onClick={() => setCurrentPage('launchpad')} 
-                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'launchpad' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-              >
-                <RocketIcon size={28} />
-                <span className="text-xs font-medium mt-1">Launchpad</span>
-              </button>
-              <button 
-                onClick={() => setCurrentPage('notifications')} 
-                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'notifications' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-              >
-                <BellIcon size={28} />
-                <span className="text-xs font-medium mt-1">Notifications</span>
-              </button>
-              <button 
-                onClick={() => {
-                  if (walletAddress) {
-                    showProfile(walletAddress);
-                  }
-                }} 
-                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'profile' && currentProfileAddress === walletAddress ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-                disabled={!walletAddress}
-              >
-                <ProfileIcon size={28} />
-                <span className="text-xs font-medium mt-1">Profile</span>
-              </button>
-              <button 
-                onClick={() => setCurrentPage('settings')} 
-                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'settings' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
-              >
-                <SettingsIcon size={28} />
-                <span className="text-xs font-medium mt-1">Settings</span>
-              </button>
-            </div>
           </div>
           {showRegistrationModal && (
             <RegistrationModal
