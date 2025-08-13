@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Monad Social</title>
+  <title>Muxster Social</title>
   <!-- Tailwind CSS CDN for styling -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- React and ReactDOM CDNs -->
@@ -21,13 +21,31 @@
       }
     }
   </style>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            'monad-purple': '#6e54ff',
+            'monad-blue': '#6e54ff',
+            'monad-accent': '#6EE7B7',
+            'monad-light': '#FFFFFF',
+            'monad-dark': '#0D0E1F',
+            'monad-dark-card': '#200052',
+            'monad-dark-text': '#E5E7EB',
+          }
+        }
+      }
+    }
+  </script>
 </head>
-<body class="bg-gray-900 font-sans">
+<body class="bg-monad-dark font-sans dark:bg-monad-light">
   <div id="root"></div>
 
   <!-- The main application code using JSX -->
   <script type="text/babel">
-    const { useState } = React;
+    const { useState, useEffect } = React;
     const { createRoot } = ReactDOM;
 
     // Use inline SVGs for icons for a clean look.
@@ -57,19 +75,33 @@
       <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-rocket ${className}`}>
         <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
         <path d="m14 14 7-7" />
-        <path d="m17 11 5 5a2 2 0 0 1 0 2.82l-2.82 2.82a2 2 0 0 1-2.82 0l-5-5" />
+        <path d="m17 11l5 5a2 2 0 0 1 0 2.82l-2.82 2.82a2 2 0 0 1-2.82 0l-5-5" />
         <path d="m5 5 5 5" />
         <path d="m14 14 5 5" />
       </svg>
     );
 
-    const BackIcon = ({ size = 24, className = "" }) => (
-      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-arrow-left ${className}`}>
-        <path d="m12 19-7-7 7-7"/>
-        <path d="M19 12H5"/>
+    const SettingsIcon = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-settings ${className}`}>
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.39a2 2 0 0 0 .73 2.73l.15.08a2 2 0 0 1 1 1.73v.52a2 2 0 0 1-1 1.73l-.15.08a2 2 0 0 0-.73 2.73l.22.39a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.73v-.52a2 2 0 0 1 1-1.73l.15-.08a2 2 0 0 0 .73-2.73l-.22-.39a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2-0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
+        <circle cx="12" cy="12" r="3" />
       </svg>
     );
 
+    const DevIcon = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-code ${className}`}>
+        <polyline points="16 18 22 12 16 6" />
+        <polyline points="8 6 2 12 8 18" />
+      </svg>
+    );
+
+    const SearchIcon = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-search ${className}`}>
+        <circle cx="11" cy="11" r="8" />
+        <path d="m21 21-4.3-4.3" />
+      </svg>
+    );
+    
     const SendIcon = () => (
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-send">
         <path d="m22 2-7 20-4-9-9-4 20-7z" />
@@ -99,31 +131,75 @@
       </svg>
     );
 
+    const CloseIcon = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-x ${className}`}>
+        <path d="M18 6 6 18" />
+        <path d="m6 6 12 12" />
+      </svg>
+    );
+
+    const SunIcon = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-sun ${className}`}>
+        <circle cx="12" cy="12" r="4" />
+        <path d="M12 2v2" />
+        <path d="M12 20v2" />
+        <path d="m4.93 4.93 1.41 1.41" />
+        <path d="m17.66 17.66 1.41 1.41" />
+        <path d="M2 12h2" />
+        <path d="M20 12h2" />
+        <path d="m6.34 17.66-1.41 1.41" />
+        <path d="m19.07 4.93-1.41 1.41" />
+      </svg>
+    );
+
+    const MoonIcon = ({ size = 24, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-moon ${className}`}>
+        <path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z" />
+      </svg>
+    );
+
+    const SparklesIcon = ({ size = 20, className = "" }) => (
+      <svg xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={`lucide lucide-sparkles ${className}`}>
+        <path d="M9.9 2.5A4.95 4.95 0 0 1 12 2a4.95 4.95 0 0 1 2.1.5l.8 1.1c.3.5.8.7 1.3.6a5.05 5.05 0 0 1 3.5 3.5c.1.5.3 1 .6 1.3l1.1.8c.8.6 1.1 1.4 1.1 2.1s-.3 1.5-.9 2.1l-1.1.8c-.5.3-.7.8-.6 1.3a5.05 5.05 0 0 1-3.5 3.5c-.5.1-1 .3-1.3.6l-.8 1.1c-.6.8-1.4 1.1-2.1 1.1s-1.5-.3-2.1-.9l-.8-1.1c-.3-.5-.8-.7-1.3-.6a5.05 5.05 0 0 1-3.5-3.5c-.1-.5-.3-1-.6-1.3l-1.1-.8c-.8-.6-1.1-1.4-1.1-2.1s.3-1.5.9-2.1l1.1-.8c.5-.3.7-.8.6-1.3a5.05 5.05 0 0 1 3.5-3.5c.5-.1 1-.3 1.3-.6l.8-1.1z" />
+      </svg>
+    );
+    
     // A simple hook to manage state
     function useSocialPlatformState() {
       const [casts, setCasts] = useState([
         {
           id: 1,
           author: '0x123...abc',
-          content: 'Hello Monad testnet! This is my first cast. Excited to build here!',
+          content: 'Hello Muxster testnet! This is my first cast. Excited to build here!',
           timestamp: Date.now() - 3600000,
           likes: 12,
-          replies: 3,
+          replies: 3
         },
         {
           id: 2,
           author: '0xdef...xyz',
-          content: 'Monad is an amazing L1! The dev experience is fantastic. #blockchain #monad',
+          content: 'Muxster is an amazing L1! The dev experience is fantastic. #blockchain #monad',
           timestamp: Date.now() - 7200000,
           likes: 25,
-          replies: 5,
+          replies: 5
         },
+        {
+          id: 3,
+          author: '0x123...abc',
+          content: 'A long post that might need to be summarized by Gemini. It contains some technical details about parallel execution and optimistic finality. This could be useful for other developers who are interested in learning about the Monad architecture and its benefits.',
+          timestamp: Date.now() - 10800000,
+          likes: 5,
+          replies: 1
+        }
       ]);
       const [newCastContent, setNewCastContent] = useState('');
       const [isLoading, setIsLoading] = useState(false);
       const [error, setError] = useState(null);
       const [walletAddress, setWalletAddress] = useState(null);
+      const [userRole, setUserRole] = useState(null);
       const [currentPage, setCurrentPage] = useState('feed');
+      const [currentProfileAddress, setCurrentProfileAddress] = useState(null);
+      const [myProfile, setMyProfile] = useState(null);
       const [projects, setProjects] = useState([
         {
           id: 1,
@@ -145,17 +221,48 @@
       const [showFundingModal, setShowFundingModal] = useState(false);
       const [selectedProject, setSelectedProject] = useState(null);
       const [isAddingProject, setIsAddingProject] = useState(false);
+      const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+      const [theme, setTheme] = useState('dark');
+      const [summaries, setSummaries] = useState({});
+      const [following, setFollowing] = useState(new Set());
 
-      const connectWallet = async () => {
+      const toggleTheme = () => {
+        const newTheme = theme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+        document.documentElement.className = newTheme;
+      };
+
+      const startRegistration = () => {
+        setShowRegistrationModal(true);
+      };
+
+      const completeRegistration = async (role) => {
         setIsLoading(true);
         setError(null);
         try {
           await new Promise(resolve => setTimeout(resolve, 1500));
           const mockAddress = '0x43525287f62e847c231785f7f2b1c43b023e120f';
+          const defaultProfilePic = `https://placehold.co/100x100/${(mockAddress.slice(2, 8) + '000000').slice(0, 6)}/ffffff?text=${mockAddress.slice(2, 4)}`;
+          const defaultBanner = `https://placehold.co/600x200/${(mockAddress.slice(8, 14) + '000000').slice(0, 6)}/ffffff?text=Banner`;
+          
           setWalletAddress(mockAddress);
+          setUserRole(role);
+          setMyProfile({
+            address: mockAddress,
+            role,
+            displayName: role,
+            username: role.toLowerCase() + '_user',
+            bio: `Just a ${role.toLowerCase()} exploring the Monad ecosystem!`,
+            profilePic: defaultProfilePic,
+            banner: defaultBanner,
+            followers: 120,
+            following: 50,
+          });
+          setCurrentProfileAddress(mockAddress);
           setCurrentPage('feed');
+          setShowRegistrationModal(false);
         } catch (e) {
-          setError('Failed to connect wallet. Please try again.');
+          setError('Failed to register. Please try again.');
         } finally {
           setIsLoading(false);
         }
@@ -163,7 +270,42 @@
       
       const disconnectWallet = () => {
         setWalletAddress(null);
+        setUserRole(null);
+        setMyProfile(null);
+        setCurrentProfileAddress(null);
         setCurrentPage('feed');
+      };
+      
+      const updateProfile = (updatedProfile) => {
+        setMyProfile(updatedProfile);
+      };
+      
+      const handleFollow = (address) => {
+        const isFollowing = following.has(address);
+        const newFollowing = new Set(following);
+        if (isFollowing) {
+          newFollowing.delete(address);
+        } else {
+          newFollowing.add(address);
+        }
+        setFollowing(newFollowing);
+        // Simulate updating the user profile's follower count
+        setMyProfile(prev => ({
+          ...prev,
+          following: isFollowing ? prev.following - 1 : prev.following + 1
+        }));
+      };
+      
+      const handleLike = (castId) => {
+        setCasts(prevCasts => prevCasts.map(cast =>
+          cast.id === castId ? { ...cast, likes: cast.likes + 1 } : cast
+        ));
+      };
+      
+      const handleReply = (castId) => {
+        setCasts(prevCasts => prevCasts.map(cast =>
+          cast.id === castId ? { ...cast, replies: cast.replies + 1 } : cast
+        ));
       };
 
       const publishNewCast = async (content) => {
@@ -190,6 +332,35 @@
         }
       };
 
+      // Function to call Gemini API for summarization
+      const summarizeCast = async (castId, content) => {
+        setSummaries(prev => ({ ...prev, [castId]: { status: 'loading' } }));
+        try {
+          // In a real application, you would use a fetch call to the Gemini API
+          // let chatHistory = [];
+          // chatHistory.push({ role: "user", parts: [{ text: `Summarize this text in one sentence: "${content}"` }] });
+          // const payload = { contents: chatHistory };
+          // const apiKey = ""
+          // const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
+          // const response = await fetch(apiUrl, {
+          //   method: 'POST',
+          //   headers: { 'Content-Type': 'application/json' },
+          //   body: JSON.stringify(payload)
+          // });
+          // const result = await response.json();
+          // const summaryText = result?.candidates?.[0]?.content?.parts?.[0]?.text || "Could not generate summary.";
+
+          // For now, we'll use a mock API call
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          const summaryText = "This is a brief summary generated by a mock LLM. It highlights key points.";
+
+          setSummaries(prev => ({ ...prev, [castId]: { status: 'success', text: summaryText } }));
+        } catch (e) {
+          console.error("Error summarizing cast:", e);
+          setSummaries(prev => ({ ...prev, [castId]: { status: 'error', text: 'Failed to generate summary.' } }));
+        }
+      };
+
       const fundProject = async (projectId, amount) => {
         setIsLoading(true);
         setError(null);
@@ -200,7 +371,6 @@
           );
           setProjects(updatedProjects);
           setShowFundingModal(false);
-          alert('Funding successful!'); // Use a custom modal in a real app
         } catch (e) {
           setError('Failed to fund project. Please try again.');
         } finally {
@@ -227,10 +397,16 @@
         error,
         publishNewCast,
         walletAddress,
-        connectWallet,
+        userRole,
+        myProfile,
+        startRegistration,
+        completeRegistration,
         disconnectWallet,
+        updateProfile,
         currentPage,
         setCurrentPage,
+        currentProfileAddress,
+        setCurrentProfileAddress,
         projects,
         fundProject,
         showFundingModal,
@@ -240,80 +416,280 @@
         isAddingProject,
         setIsAddingProject,
         addProject,
+        showRegistrationModal,
+        setShowRegistrationModal,
+        theme,
+        toggleTheme,
+        summaries,
+        summarizeCast,
+        following,
+        handleFollow,
+        handleLike,
+        handleReply,
       };
     }
 
-    const Cast = ({ author, content, timestamp, likes, replies, showProfile }) => (
-      <div className="flex space-x-4 p-4 border-b border-gray-700 hover:bg-gray-800 transition-colors duration-150">
-        <div className="flex-shrink-0 cursor-pointer text-indigo-400 hover:text-indigo-300" onClick={() => showProfile(author)}>
-          <ProfileIcon />
-        </div>
-        <div className="flex-grow">
-          <div className="flex justify-between items-center text-sm text-gray-400">
-            <span 
-              className="font-semibold text-indigo-400 cursor-pointer hover:underline"
-              onClick={() => showProfile(author)}
-            >
-              User <span className="font-mono text-xs text-gray-500">{author.substring(0, 6)}...{author.substring(author.length - 4)}</span>
-            </span>
-            <span>{new Date(timestamp).toLocaleString()}</span>
-          </div>
-          <p className="mt-2 text-white leading-relaxed">{content}</p>
-          <div className="flex space-x-6 mt-4 text-gray-500 text-sm">
-            <button className="flex items-center space-x-1 hover:text-red-400 transition-colors duration-150">
-              <HeartIcon />
-              <span>{likes}</span>
-            </button>
-            <button className="flex items-center space-x-1 hover:text-cyan-400 transition-colors duration-150">
-              <MessageCircleIcon />
-              <span>{replies}</span>
-            </button>
-            <button className="flex items-center space-x-1 hover:text-emerald-400 transition-colors duration-150">
-              <ShareIcon />
+    const Cast = ({ id, author, content, timestamp, showProfile, myProfile, summaries, summarizeCast, handleLike, handleReply }) => {
+      const isMyCast = myProfile && author === myProfile.address;
+      const profilePic = isMyCast ? myProfile.profilePic : `https://placehold.co/100x100/${(author.slice(2, 8) + '000000').slice(0, 6)}/ffffff?text=${author.slice(2, 4)}`;
+      const authorName = isMyCast ? myProfile.displayName : 'User';
+      const authorUsername = isMyCast ? myProfile.username : author.substring(0, 6) + '...';
+      const summary = summaries[id];
+      const [localLikes, setLocalLikes] = useState(12); // Mock data for likes
+      const [localReplies, setLocalReplies] = useState(3); // Mock data for replies
+
+      const handleLikeClick = () => {
+        setLocalLikes(localLikes + 1);
+        handleLike(id);
+      };
+
+      const handleReplyClick = () => {
+        setLocalReplies(localReplies + 1);
+        handleReply(id);
+      };
+
+      return (
+        <div className="flex space-x-4 p-4 border-b border-gray-700 dark:border-gray-300 hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors duration-150">
+          <div className="flex-shrink-0">
+            <button onClick={() => showProfile(author)} className="block w-10 h-10 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-monad-blue">
+              <img src={profilePic} alt="Profile" className="w-full h-full object-cover"/>
             </button>
           </div>
+          <div className="flex-grow">
+            <div className="flex justify-between items-center text-sm text-gray-400 dark:text-gray-600">
+              <button
+                className="font-semibold text-monad-purple dark:text-monad-blue hover:underline cursor-pointer"
+                onClick={() => showProfile(author)}
+              >
+                {authorName} <span className="font-mono text-xs text-gray-500 dark:text-gray-400">@{authorUsername}</span>
+              </button>
+              <span>{new Date(timestamp).toLocaleString()}</span>
+            </div>
+            <p className="mt-2 text-monad-dark-text dark:text-monad-dark leading-relaxed">{content}</p>
+            {content.length > 50 && (
+              <div className="mt-2">
+                {summary && summary.status === 'loading' ? (
+                  <div className="flex items-center space-x-2 text-monad-purple dark:text-monad-blue">
+                    <div className="animate-spin rounded-full h-4 w-4 border-t-2 border-b-2 border-monad-blue"></div>
+                    <p className="text-sm">Generating summary...</p>
+                  </div>
+                ) : summary && summary.status === 'success' ? (
+                  <div className="bg-gray-700 dark:bg-gray-200 p-2 rounded-lg text-monad-dark-text dark:text-monad-dark text-sm">
+                    ✨ {summary.text}
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => summarizeCast(id, content)}
+                    className="flex items-center space-x-1 text-sm text-monad-purple dark:text-monad-blue hover:underline transition-colors duration-150"
+                  >
+                    <SparklesIcon size={16}/>
+                    <span>Summarize with Gemini</span>
+                  </button>
+                )}
+              </div>
+            )}
+            <div className="flex space-x-6 mt-4 text-gray-500 dark:text-gray-500 text-sm">
+              <button onClick={handleLikeClick} className="flex items-center space-x-1 hover:text-red-400 transition-colors duration-150">
+                <HeartIcon />
+                <span>{localLikes}</span>
+              </button>
+              <button onClick={handleReplyClick} className="flex items-center space-x-1 hover:text-cyan-400 transition-colors duration-150">
+                <MessageCircleIcon />
+                <span>{localReplies}</span>
+              </button>
+              <button className="flex items-center space-x-1 hover:text-emerald-400 transition-colors duration-150">
+                <ShareIcon />
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    );
+      );
+    };
 
-    const ProfilePage = ({ address, disconnect }) => (
-      <div className="p-4 sm:p-6 h-full">
-        <div className="flex flex-col items-center p-8 bg-gray-700 rounded-2xl shadow-lg">
-          <ProfileIcon className="text-indigo-400 w-20 h-20 mb-4" />
-          <h2 className="text-2xl font-bold text-white mt-4">User Profile</h2>
-          <p className="text-md text-gray-400 mt-2">Wallet Address:</p>
-          <p className="text-sm font-mono break-all bg-gray-800 p-2 rounded-lg text-emerald-400 mt-1">
-            {address}
-          </p>
-          <button
-            onClick={disconnect}
-            className="mt-6 bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-5 rounded-full shadow-lg transition-colors duration-200"
-          >
-            Disconnect Wallet
-          </button>
+    const ProfilePage = ({ address, userRole, casts, myProfile, updateProfile, following, handleFollow }) => {
+      const isMyProfile = myProfile && address === myProfile.address;
+      const userCasts = casts.filter(cast => cast.author === address);
+      const isFollowing = following.has(address);
+      
+      const [isEditing, setIsEditing] = useState(false);
+      const [editForm, setEditForm] = useState(isMyProfile ? {
+        displayName: myProfile.displayName,
+        username: myProfile.username,
+        bio: myProfile.bio,
+        profilePic: myProfile.profilePic,
+        banner: myProfile.banner,
+      } : null);
+      
+      const handleEditChange = (e) => {
+        const { name, value } = e.target;
+        setEditForm(prev => ({ ...prev, [name]: value }));
+      };
+      
+      const handleImageUpload = (e) => {
+        const { name, files } = e.target;
+        if (files.length > 0) {
+          const file = files[0];
+          const reader = new FileReader();
+          reader.onloadend = () => {
+            setEditForm(prev => ({ ...prev, [name]: reader.result }));
+          };
+          reader.readAsDataURL(file);
+        }
+      };
+
+      const handleSave = () => {
+        updateProfile({ ...myProfile, ...editForm });
+        setIsEditing(false);
+      };
+
+      const userProfile = isMyProfile ? myProfile : {
+        displayName: 'Guest User',
+        username: address.substring(0, 6),
+        bio: 'This is a public user profile on the Muxster social network.',
+        profilePic: `https://placehold.co/100x100/${(address.slice(2, 8) + '000000').slice(0, 6)}/ffffff?text=${address.slice(2, 4)}`,
+        banner: `https://placehold.co/600x200/${(address.slice(8, 14) + '000000').slice(0, 6)}/ffffff?text=Banner`
+      };
+
+      return (
+        <div className="h-full">
+          <div className="relative">
+            <img src={isEditing ? editForm.banner : userProfile.banner} alt="User banner" className="w-full h-40 object-cover rounded-t-3xl"/>
+            <div className="absolute -bottom-10 left-4">
+              <img src={isEditing ? editForm.profilePic : userProfile.profilePic} alt="User profile" className="w-24 h-24 rounded-full border-4 border-monad-dark-card dark:border-monad-light shadow-lg"/>
+            </div>
+          </div>
+          <div className="p-4 pt-16 sm:p-6">
+            <div className="flex justify-end">
+              {isMyProfile && !isEditing && (
+                <button 
+                  onClick={() => setIsEditing(true)}
+                  className="bg-gray-600 dark:bg-gray-400 dark:text-monad-dark hover:bg-gray-500 text-white font-bold py-2 px-4 rounded-full transition-colors duration-200"
+                >
+                  Edit Profile
+                </button>
+              )}
+              {!isMyProfile && (
+                <button 
+                  onClick={() => handleFollow(address)}
+                  className={`font-bold py-2 px-4 rounded-full transition-colors duration-200 ${isFollowing ? 'bg-gray-600 dark:bg-gray-400 text-white dark:text-monad-dark' : 'bg-monad-accent hover:bg-emerald-600 text-monad-dark'}`}
+                >
+                  {isFollowing ? 'Following' : 'Follow'}
+                </button>
+              )}
+            </div>
+            
+            {!isEditing ? (
+              <>
+                <h2 className="text-2xl font-bold text-monad-dark-text dark:text-monad-dark mt-4">{userProfile.displayName}</h2>
+                <p className="text-sm text-gray-400 dark:text-gray-600 mt-1">@{userProfile.username}</p>
+                <p className="text-sm text-gray-400 dark:text-gray-600 mt-1">
+                  {address.substring(0, 6)}...{address.substring(address.length - 4)}
+                </p>
+                <p className="text-md text-gray-300 dark:text-gray-700 mt-4">{userProfile.bio}</p>
+                <div className="flex space-x-6 mt-4 text-gray-400 dark:text-gray-600">
+                    <span><span className="font-bold text-monad-dark-text dark:text-monad-dark">
+                      {isMyProfile ? myProfile.followers : Math.floor(Math.random() * 1000) + 10}
+                    </span> Followers</span>
+                    <span><span className="font-bold text-monad-dark-text dark:text-monad-dark">
+                      {isMyProfile ? myProfile.following : Math.floor(Math.random() * 500) + 5}
+                    </span> Following</span>
+                </div>
+              </>
+            ) : (
+              <form className="mt-4 space-y-4">
+                <label className="block text-sm font-medium text-gray-300 dark:text-gray-700">Display Name</label>
+                <input
+                  type="text"
+                  name="displayName"
+                  value={editForm.displayName}
+                  onChange={handleEditChange}
+                  className="w-full p-2 rounded-lg bg-gray-700 text-white dark:bg-gray-200 dark:text-monad-dark"
+                />
+                <label className="block text-sm font-medium text-gray-300 dark:text-gray-700">Username</label>
+                <input
+                  type="text"
+                  name="username"
+                  value={editForm.username}
+                  onChange={handleEditChange}
+                  className="w-full p-2 rounded-lg bg-gray-700 text-white dark:bg-gray-200 dark:text-monad-dark"
+                />
+                <label className="block text-sm font-medium text-gray-300 dark:text-gray-700">Bio</label>
+                <textarea
+                  name="bio"
+                  value={editForm.bio}
+                  onChange={handleEditChange}
+                  rows="3"
+                  className="w-full p-2 rounded-lg bg-gray-700 text-white dark:bg-gray-200 dark:text-monad-dark"
+                />
+                <label className="block text-sm font-medium text-gray-300 dark:text-gray-700">Profile Picture</label>
+                <input
+                  type="file"
+                  name="profilePic"
+                  onChange={handleImageUpload}
+                  className="w-full p-2 rounded-lg bg-gray-700 text-white dark:bg-gray-200 dark:text-monad-dark file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-monad-blue file:text-white dark:file:bg-monad-purple dark:file:text-white hover:file:bg-indigo-600 dark:hover:file:bg-indigo-700"
+                />
+                <label className="block text-sm font-medium text-gray-300 dark:text-gray-700">Banner Picture</label>
+                <input
+                  type="file"
+                  name="banner"
+                  onChange={handleImageUpload}
+                  className="w-full p-2 rounded-lg bg-gray-700 text-white dark:bg-gray-200 dark:text-monad-dark file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-monad-blue file:text-white dark:file:bg-monad-purple dark:file:text-white hover:file:bg-indigo-600 dark:hover:file:bg-indigo-700"
+                />
+                <div className="flex justify-end space-x-4">
+                  <button
+                    type="button"
+                    onClick={() => setIsEditing(false)}
+                    className="py-2 px-4 rounded-full text-white bg-gray-600 dark:bg-gray-400 dark:text-monad-dark hover:bg-gray-700 transition-colors duration-200"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleSave}
+                    className="py-2 px-4 rounded-full text-white bg-monad-blue hover:bg-indigo-700 transition-colors duration-200"
+                  >
+                    Save
+                  </button>
+                </div>
+              </form>
+            )}
+          </div>
+          <div className="border-t border-gray-700 dark:border-gray-300 mt-4 p-4 sm:p-6">
+            <h3 className="text-xl font-bold text-monad-dark-text dark:text-monad-dark mb-4">Casts</h3>
+            <div className="space-y-4">
+              {userCasts.length > 0 ? (
+                userCasts.map((cast) => (
+                  <div key={cast.id} className="bg-gray-700 dark:bg-gray-200 p-4 rounded-xl">
+                    <p className="text-monad-dark-text dark:text-monad-dark leading-relaxed">{cast.content}</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-500 mt-2">
+                      {new Date(cast.timestamp).toLocaleString()}
+                    </p>
+                  </div>
+                ))
+              ) : (
+                <p className="text-center text-gray-400 dark:text-gray-600">No casts found for this user.</p>
+              )}
+            </div>
+          </div>
         </div>
-      </div>
-    );
+      );
+    };
 
-    const FeedPage = ({ casts, newCastContent, setNewCastContent, isLoading, error, publishNewCast, walletAddress, setCurrentPage }) => {
+    const FeedPage = ({ casts, newCastContent, setNewCastContent, isLoading, error, publishNewCast, walletAddress, showProfile, myProfile, summaries, summarizeCast, handleLike, handleReply }) => {
       const handlePublish = (e) => {
         e.preventDefault();
         if (newCastContent.trim()) {
           publishNewCast(newCastContent);
         }
       };
-      
-      const showProfile = (address) => {
-        setCurrentPage('profile');
-      };
 
       return (
         <>
-          <div className="p-4 sm:p-6 border-b border-gray-700">
+          <div className="p-4 sm:p-6 border-b border-gray-700 dark:border-gray-300">
             {walletAddress ? (
               <form onSubmit={handlePublish} className="flex flex-col space-y-4">
                 <textarea
-                  className="w-full p-3 bg-gray-700 text-white rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all duration-200"
+                  className="w-full p-3 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-monad-blue bg-gray-700 text-white dark:bg-gray-200 dark:text-monad-dark transition-all duration-200"
                   rows="3"
                   placeholder="What's on your mind? (140 characters max)"
                   value={newCastContent}
@@ -322,10 +698,10 @@
                   disabled={isLoading}
                 />
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-500">{newCastContent.length}/140</span>
+                  <span className="text-sm text-gray-500 dark:text-gray-500">{newCastContent.length}/140</span>
                   <button
                     type="submit"
-                    className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-5 rounded-full shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center space-x-2 bg-monad-blue hover:bg-monad-purple text-white font-bold py-2 px-5 rounded-full shadow-lg transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
                     disabled={isLoading || !newCastContent.trim()}
                   >
                     {isLoading ? 'Posting...' : (
@@ -338,14 +714,14 @@
                 </div>
               </form>
             ) : (
-              <p className="text-center text-gray-400 py-4">Connect your wallet to start casting!</p>
+              <p className="text-center text-gray-400 dark:text-gray-600 py-4">Get started to begin casting!</p>
             )}
-            {error && <p className="text-red-400 text-center mt-4">{error}</p>}
+            {error && <p className="text-red-400 dark:text-red-500 text-center mt-4">{error}</p>}
           </div>
 
           <div className="pb-20">
             {casts.map((cast) => (
-              <Cast key={cast.id} {...cast} showProfile={showProfile} />
+              <Cast key={cast.id} {...cast} showProfile={showProfile} myProfile={myProfile} summaries={summaries} summarizeCast={summarizeCast} handleLike={handleLike} handleReply={handleReply} />
             ))}
           </div>
         </>
@@ -353,13 +729,79 @@
     };
 
     const NotificationsPage = () => (
-      <div className="p-6 text-center text-gray-400">
-        <BellIcon size={48} className="mx-auto mb-4 text-indigo-400"/>
-        <h2 className="text-2xl font-bold mb-2 text-white">Notifications</h2>
-        <p>This is where your notifications will appear.</p>
-        <p className="mt-2">This feature is coming soon!</p>
+      <div className="p-6">
+        <h2 className="text-2xl font-bold mb-4 text-monad-dark-text dark:text-monad-dark">Notifications</h2>
+        <div className="space-y-4">
+          <div className="bg-gray-700 dark:bg-gray-200 p-4 rounded-xl flex items-center space-x-4">
+            <BellIcon size={24} className="text-monad-purple dark:text-monad-blue" />
+            <p className="text-monad-dark-text dark:text-monad-dark">User 0x123...abc liked your post!</p>
+          </div>
+          <div className="bg-gray-700 dark:bg-gray-200 p-4 rounded-xl flex items-center space-x-4">
+            <ProfileIcon size={24} className="text-monad-purple dark:text-monad-blue" />
+            <p className="text-monad-dark-text dark:text-monad-dark">User 0xdef...xyz is now following you.</p>
+          </div>
+          <div className="bg-gray-700 dark:bg-gray-200 p-4 rounded-xl flex items-center space-x-4">
+            <RocketIcon size={24} className="text-monad-accent" />
+            <p className="text-monad-dark-text dark:text-monad-dark">The "Monad NFT Project" has reached its funding goal!</p>
+          </div>
+        </div>
       </div>
     );
+
+    const ExplorePage = ({ showProfile }) => {
+      const [searchTerm, setSearchTerm] = useState('');
+      
+      const trendingTopics = ['#monad', '#defi', '#nft', '#buildonmonad'];
+      const suggestedUsers = [
+        { address: '0xabc...123', name: 'Dev Alpha' },
+        { address: '0xdef...456', name: 'Builder Beta' },
+        { address: '0xghi...789', name: 'Monad Fan' },
+      ];
+
+      return (
+        <div className="p-6">
+          <h2 className="text-2xl font-bold mb-4 text-monad-dark-text dark:text-monad-dark">Explore</h2>
+          <div className="mb-6">
+            <input
+              type="text"
+              placeholder="Search Muxster"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full p-3 rounded-xl bg-gray-700 text-white dark:bg-gray-200 dark:text-monad-dark focus:outline-none focus:ring-2 focus:ring-monad-blue"
+            />
+          </div>
+          <div className="mb-6">
+            <h3 className="text-xl font-semibold mb-3 text-monad-dark-text dark:text-monad-dark">Trending</h3>
+            <div className="flex flex-wrap gap-2">
+              {trendingTopics.map(topic => (
+                <button key={topic} className="bg-gray-700 dark:bg-gray-200 text-monad-purple dark:text-monad-blue text-sm font-semibold px-4 py-2 rounded-full hover:bg-gray-600 dark:hover:bg-gray-300 transition-colors duration-200">
+                  {topic}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <h3 className="text-xl font-semibold mb-3 text-monad-dark-text dark:text-monad-dark">Suggested for you</h3>
+            <div className="space-y-4">
+              {suggestedUsers.map(user => (
+                <div key={user.address} className="bg-gray-700 dark:bg-gray-200 p-3 rounded-xl flex items-center justify-between">
+                  <div className="flex items-center space-x-3">
+                    <img src={`https://placehold.co/50x50/${(user.address.slice(2, 8) + '000000').slice(0, 6)}/ffffff?text=${user.address.slice(2, 4)}`} alt="User profile" className="w-10 h-10 rounded-full" />
+                    <div>
+                      <p className="font-semibold text-monad-dark-text dark:text-monad-dark">{user.name}</p>
+                      <p className="text-sm text-gray-400 dark:text-gray-600">@{user.address.substring(0, 6)}...</p>
+                    </div>
+                  </div>
+                  <button onClick={() => showProfile(user.address)} className="bg-monad-accent hover:bg-emerald-600 text-monad-dark font-bold py-1 px-3 rounded-full transition-colors duration-200">
+                    View Profile
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      );
+    };
     
     // New components for the launchpad
     const FundingModal = ({ project, onFund, onClose }) => {
@@ -372,29 +814,29 @@
       };
 
       return (
-        <div className="fixed inset-0 bg-gray-900 bg-opacity-75 flex items-center justify-center p-4 z-50">
-          <div className="bg-gray-800 p-6 rounded-2xl shadow-2xl max-w-sm w-full">
-            <h3 className="text-xl font-bold mb-4 text-white">Fund Project: {project.name}</h3>
-            <p className="text-gray-400 mb-4">
+        <div className="fixed inset-0 bg-gray-900 dark:bg-gray-100 bg-opacity-75 dark:bg-opacity-75 flex items-center justify-center p-4 z-50">
+          <div className="bg-monad-dark-card dark:bg-white p-6 rounded-2xl shadow-2xl max-w-sm w-full">
+            <h3 className="text-xl font-bold mb-4 text-monad-dark-text dark:text-monad-dark">Fund Project: {project.name}</h3>
+            <p className="text-gray-400 dark:text-gray-600 mb-4">
               Current Goal: {project.raised} / {project.goal} MON
             </p>
-            <label className="block mb-2 text-gray-300">Amount to fund (MON):</label>
+            <label className="block mb-2 text-gray-300 dark:text-gray-700">Amount to fund (MON):</label>
             <input 
               type="number"
               value={amount}
               onChange={(e) => setAmount(parseInt(e.target.value) || 0)}
-              className="w-full p-2 rounded-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-2 rounded-lg bg-gray-700 text-white dark:bg-gray-200 dark:text-monad-dark focus:outline-none focus:ring-2 focus:ring-monad-blue"
             />
             <div className="flex justify-end space-x-4 mt-6">
               <button 
                 onClick={onClose}
-                className="py-2 px-4 rounded-full text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
+                className="py-2 px-4 rounded-full text-white bg-gray-600 dark:bg-gray-400 dark:text-monad-dark hover:bg-gray-700 dark:hover:bg-gray-500 transition-colors duration-200"
               >
                 Cancel
               </button>
               <button
                 onClick={handleFund}
-                className="py-2 px-4 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200 disabled:opacity-50"
+                className="py-2 px-4 rounded-full text-white bg-monad-blue hover:bg-monad-purple transition-colors duration-200 disabled:opacity-50"
                 disabled={amount <= 0}
               >
                 Fund
@@ -408,26 +850,26 @@
     const ProjectCard = ({ project, onFundClick }) => {
       const progress = Math.min(100, (project.raised / project.goal) * 100);
       return (
-        <div className="bg-gray-700 p-4 rounded-xl shadow-lg flex flex-col justify-between">
+        <div className="bg-gray-700 dark:bg-gray-200 p-4 rounded-xl shadow-lg flex flex-col justify-between">
           <div>
-            <h3 className="text-xl font-bold text-indigo-400">{project.name}</h3>
-            <p className="text-sm text-gray-400 mt-1">{project.description}</p>
+            <h3 className="text-xl font-bold text-monad-purple dark:text-monad-blue">{project.name}</h3>
+            <p className="text-sm text-gray-400 dark:text-gray-600 mt-1">{project.description}</p>
             <div className="mt-4">
-              <div className="w-full bg-gray-600 rounded-full h-2.5">
+              <div className="w-full bg-gray-600 dark:bg-gray-400 rounded-full h-2.5">
                 <div 
-                  className="bg-emerald-500 h-2.5 rounded-full transition-all duration-500" 
+                  className="bg-monad-accent h-2.5 rounded-full transition-all duration-500" 
                   style={{ width: `${progress}%` }}
                 ></div>
               </div>
-              <div className="flex justify-between text-sm mt-2 text-gray-400">
-                <span>Raised: <span className="font-semibold text-white">{project.raised} MON</span></span>
-                <span>Goal: <span className="font-semibold text-white">{project.goal} MON</span></span>
+              <div className="flex justify-between text-sm mt-2 text-gray-400 dark:text-gray-600">
+                <span>Raised: <span className="font-semibold text-monad-dark-text dark:text-monad-dark">{project.raised} MON</span></span>
+                <span>Goal: <span className="font-semibold text-monad-dark-text dark:text-monad-dark">{project.goal} MON</span></span>
               </div>
             </div>
           </div>
           <button 
             onClick={() => onFundClick(project)}
-            className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors duration-200"
+            className="mt-4 bg-monad-blue hover:bg-monad-purple text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors duration-200"
           >
             Fund Project
           </button>
@@ -448,22 +890,22 @@
       };
 
       return (
-        <div className="p-4 bg-gray-700 rounded-xl shadow-lg mt-6">
-          <h3 className="text-xl font-bold text-white mb-4">Create a New Project</h3>
+        <div className="p-4 bg-gray-700 dark:bg-gray-200 rounded-xl shadow-lg mt-6">
+          <h3 className="text-xl font-bold text-monad-dark-text dark:text-monad-dark mb-4">Create a New Mux</h3>
           <form onSubmit={handleSubmit} className="space-y-4">
             <input 
               type="text" 
-              placeholder="Project Name" 
+              placeholder="Mux Name" 
               value={name} 
               onChange={(e) => setName(e.target.value)}
-              className="w-full p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-3 rounded-lg bg-gray-800 text-white dark:bg-white dark:text-monad-dark focus:outline-none focus:ring-2 focus:ring-monad-blue"
               required
             />
             <textarea
-              placeholder="Project Description"
+              placeholder="Mux Description"
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="w-full p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none"
+              className="w-full p-3 rounded-lg bg-gray-800 text-white dark:bg-white dark:text-monad-dark focus:outline-none focus:ring-2 focus:ring-monad-blue resize-none"
               rows="3"
               required
             />
@@ -472,22 +914,22 @@
               placeholder="Funding Goal (MON)"
               value={goal}
               onChange={(e) => setGoal(e.target.value)}
-              className="w-full p-3 rounded-lg bg-gray-800 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              className="w-full p-3 rounded-lg bg-gray-800 text-white dark:bg-white dark:text-monad-dark focus:outline-none focus:ring-2 focus:ring-monad-blue"
               required
             />
             <div className="flex justify-end space-x-4">
               <button 
                 type="button" 
                 onClick={onCancel}
-                className="py-2 px-4 rounded-full text-white bg-gray-600 hover:bg-gray-700 transition-colors duration-200"
+                className="py-2 px-4 rounded-full text-white bg-gray-600 dark:bg-gray-400 dark:text-monad-dark hover:bg-gray-700 dark:hover:bg-gray-500 transition-colors duration-200"
               >
                 Cancel
               </button>
               <button
                 type="submit"
-                className="py-2 px-4 rounded-full text-white bg-indigo-600 hover:bg-indigo-700 transition-colors duration-200"
+                className="py-2 px-4 rounded-full text-white bg-monad-blue hover:bg-monad-purple transition-colors duration-200"
               >
-                Submit Project
+                Submit Mux
               </button>
             </div>
           </form>
@@ -495,36 +937,32 @@
       );
     };
 
-    const LaunchpadPage = ({ projects, fundProject, walletAddress, isLoading, showFundingModal, setShowFundingModal, selectedProject, setSelectedProject, isAddingProject, setIsAddingProject, addProject }) => {
+    const LaunchpadPage = ({ projects, fundProject, walletAddress, userRole, isLoading, showFundingModal, setShowFundingModal, selectedProject, setSelectedProject, isAddingProject, setIsAddingProject, addProject }) => {
       const handleFundClick = (project) => {
         if (walletAddress) {
           setSelectedProject(project);
           setShowFundingModal(true);
         } else {
-          alert('Please connect your wallet to fund a project.');
+          alert('Please get started to fund a project.');
         }
       };
 
       return (
         <div className="p-4 sm:p-6">
-          <h2 className="text-2xl font-bold mb-4 text-white">Community Launchpad</h2>
-          <p className="text-gray-400 mb-6">Support new projects on the Monad testnet!</p>
+          <h2 className="text-2xl font-bold mb-4 text-monad-dark-text dark:text-monad-dark">Community Launchpad</h2>
+          <p className="text-gray-400 dark:text-gray-600 mb-6">Support new projects on the Monad testnet!</p>
           
-          {isAddingProject ? (
-            <NewProjectForm addProject={addProject} onCancel={() => setIsAddingProject(false)} />
-          ) : (
-            <button
-              onClick={() => {
-                if (walletAddress) {
-                  setIsAddingProject(true);
-                } else {
-                  alert('Please connect your wallet to create a new project.');
-                }
-              }}
-              className="w-full mb-6 py-3 px-6 text-white bg-emerald-600 hover:bg-emerald-700 rounded-full font-bold shadow-lg transition-colors duration-200"
-            >
-              Create New Project
-            </button>
+          {userRole === 'Muxer' && (
+            isAddingProject ? (
+              <NewProjectForm addProject={addProject} onCancel={() => setIsAddingProject(false)} />
+            ) : (
+              <button
+                onClick={() => setIsAddingProject(true)}
+                className="w-full mb-6 py-3 px-6 text-monad-dark font-bold bg-monad-accent hover:bg-emerald-600 rounded-full shadow-lg transition-colors duration-200"
+              >
+                Create New Mux
+              </button>
+            )
           )}
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
@@ -548,6 +986,60 @@
       );
     };
 
+    const RegistrationModal = ({ completeRegistration, isLoading, onClose }) => (
+      <div className="fixed inset-0 bg-gray-900 dark:bg-gray-100 bg-opacity-75 dark:bg-opacity-75 flex items-center justify-center p-4 z-50">
+        <div className="bg-monad-dark-card dark:bg-white p-6 rounded-2xl shadow-2xl max-w-md w-full text-center">
+          <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-white dark:hover:text-monad-dark"><CloseIcon /></button>
+          <h3 className="text-2xl font-bold mb-4 text-monad-purple dark:text-monad-blue">Choose Your Role</h3>
+          <p className="text-gray-300 dark:text-gray-700 mb-6">Connect your wallet and pick your path in the Muxster ecosystem.</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <button
+              onClick={() => completeRegistration('Muxster')}
+              className="flex flex-col items-center p-6 bg-gray-700 dark:bg-gray-200 rounded-xl hover:bg-monad-blue transition-colors duration-200 disabled:opacity-50 text-monad-dark-text dark:text-monad-dark hover:text-white"
+              disabled={isLoading}
+            >
+              <ProfileIcon size={48} className="text-white mb-2 dark:text-monad-dark" />
+              <span className="text-lg font-semibold">Muxster</span>
+              <span className="text-sm text-gray-400 dark:text-gray-600">Regular User</span>
+            </button>
+            <button
+              onClick={() => completeRegistration('Muxer')}
+              className="flex flex-col items-center p-6 bg-gray-700 dark:bg-gray-200 rounded-xl hover:bg-monad-blue transition-colors duration-200 disabled:opacity-50 text-monad-dark-text dark:text-monad-dark hover:text-white"
+              disabled={isLoading}
+            >
+              <DevIcon size={48} className="text-white mb-2 dark:text-monad-dark" />
+              <span className="text-lg font-semibold">Muxer</span>
+              <span className="text-sm text-gray-400 dark:text-gray-600">Developer</span>
+            </button>
+            <button
+              onClick={() => completeRegistration('Mux')}
+              className="flex flex-col items-center p-6 bg-gray-700 dark:bg-gray-200 rounded-xl hover:bg-monad-blue transition-colors duration-200 disabled:opacity-50 text-monad-dark-text dark:text-monad-dark hover:text-white"
+              disabled={isLoading}
+            >
+              <RocketIcon size={48} className="text-white mb-2 dark:text-monad-dark" />
+              <span className="text-lg font-semibold">Mux</span>
+              <span className="text-sm text-gray-400 dark:text-gray-600">Project</span>
+            </button>
+          </div>
+          {isLoading && <p className="mt-4 text-monad-blue dark:text-monad-purple">Connecting...</p>}
+        </div>
+      </div>
+    );
+
+    const SettingsPage = ({ disconnectWallet }) => (
+      <div className="p-6">
+        <h2 className="text-2xl font-bold mb-6 text-monad-dark-text dark:text-monad-dark">Settings</h2>
+        <div className="bg-gray-700 dark:bg-gray-200 p-6 rounded-xl shadow-lg">
+          <p className="text-md text-gray-300 dark:text-gray-700 mb-4">Manage your account and preferences.</p>
+          <button
+            onClick={disconnectWallet}
+            className="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-6 rounded-full shadow-lg transition-colors duration-200"
+          >
+            Disconnect Wallet
+          </button>
+        </div>
+      </div>
+    );
 
     const App = () => {
       const {
@@ -558,10 +1050,16 @@
         error,
         publishNewCast,
         walletAddress,
-        connectWallet,
+        userRole,
+        myProfile,
+        startRegistration,
+        completeRegistration,
         disconnectWallet,
+        updateProfile,
         currentPage,
         setCurrentPage,
+        currentProfileAddress,
+        setCurrentProfileAddress,
         projects,
         fundProject,
         showFundingModal,
@@ -571,7 +1069,22 @@
         isAddingProject,
         setIsAddingProject,
         addProject,
+        showRegistrationModal,
+        setShowRegistrationModal,
+        theme,
+        toggleTheme,
+        summaries,
+        summarizeCast,
+        following,
+        handleFollow,
+        handleLike,
+        handleReply,
       } = useSocialPlatformState();
+      
+      const showProfile = (address) => {
+        setCurrentProfileAddress(address);
+        setCurrentPage('profile');
+      };
 
       const renderPage = () => {
         switch (currentPage) {
@@ -585,25 +1098,39 @@
                 error={error}
                 publishNewCast={publishNewCast}
                 walletAddress={walletAddress}
-                setCurrentPage={setCurrentPage}
+                showProfile={showProfile}
+                myProfile={myProfile}
+                summaries={summaries}
+                summarizeCast={summarizeCast}
+                handleLike={handleLike}
+                handleReply={handleReply}
               />
             );
           case 'profile':
+            const profileCasts = casts.filter(c => c.author === currentProfileAddress);
             return (
               <ProfilePage
-                address={walletAddress}
-                disconnect={disconnectWallet}
-                goBack={() => setCurrentPage('feed')}
+                address={currentProfileAddress}
+                userRole={userRole}
+                myProfile={myProfile}
+                casts={profileCasts}
+                updateProfile={updateProfile}
+                setCurrentPage={setCurrentPage}
+                following={following}
+                handleFollow={handleFollow}
               />
             );
           case 'notifications':
             return <NotificationsPage />;
+          case 'explore':
+            return <ExplorePage showProfile={showProfile} />;
           case 'launchpad':
             return (
               <LaunchpadPage
                 projects={projects}
                 fundProject={fundProject}
                 walletAddress={walletAddress}
+                userRole={userRole}
                 isLoading={isLoading}
                 showFundingModal={showFundingModal}
                 setShowFundingModal={setShowFundingModal}
@@ -614,8 +1141,11 @@
                 addProject={addProject}
               />
             );
+          case 'settings':
+            return <SettingsPage disconnectWallet={disconnectWallet} />;
           default:
-            return <FeedPage 
+            return (
+              <FeedPage 
                 casts={casts}
                 newCastContent={newCastContent}
                 setNewCastContent={setNewCastContent}
@@ -623,66 +1153,161 @@
                 error={error}
                 publishNewCast={publishNewCast}
                 walletAddress={walletAddress}
-                setCurrentPage={setCurrentPage}
-              />;
+                showProfile={showProfile}
+                myProfile={myProfile}
+                summaries={summaries}
+                summarizeCast={summarizeCast}
+                handleLike={handleLike}
+                handleReply={handleReply}
+              />
+            );
         }
       };
 
       return (
-        <div className="min-h-screen bg-gray-900 text-gray-100 flex justify-center p-4 sm:p-8 font-sans">
-          <div className="w-full max-w-2xl bg-gray-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col relative">
-            {/* Header */}
-            <div className="p-4 sm:p-6 bg-gray-900 border-b border-gray-700 flex justify-between items-center z-20">
-              <h1 className="text-2xl sm:text-3xl font-bold text-indigo-400">Monad Social</h1>
+        <div className="flex justify-center p-4 sm:p-8 font-sans bg-monad-dark dark:bg-monad-light min-h-screen">
+          {/* Desktop Sidebar */}
+          <div className="hidden sm:flex flex-col w-64 pr-8">
+            <div className="p-4 flex flex-col space-y-4">
+              <h1 className="text-3xl font-bold text-monad-purple dark:text-monad-blue">Muxster</h1>
+              <button 
+                onClick={() => setCurrentPage('feed')} 
+                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'feed' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
+              >
+                <HomeIcon size={24} />
+                <span className="text-lg font-medium">Timeline</span>
+              </button>
+              <button 
+                onClick={() => setCurrentPage('explore')}
+                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'explore' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
+              >
+                <SearchIcon size={24} />
+                <span className="text-lg font-medium">Explore</span>
+              </button>
+              <button 
+                onClick={() => setCurrentPage('launchpad')} 
+                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'launchpad' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
+              >
+                <RocketIcon size={24} />
+                <span className="text-lg font-medium">Launchpad</span>
+              </button>
+              <button 
+                onClick={() => setCurrentPage('notifications')} 
+                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'notifications' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
+              >
+                <BellIcon size={24} />
+                <span className="text-lg font-medium">Notifications</span>
+              </button>
+              <button 
+                onClick={() => {
+                  if (walletAddress) {
+                    showProfile(walletAddress);
+                  }
+                }} 
+                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'profile' && currentProfileAddress === walletAddress ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
+                disabled={!walletAddress}
+              >
+                <ProfileIcon size={24} />
+                <span className="text-lg font-medium">Profile</span>
+              </button>
+              <button 
+                onClick={() => setCurrentPage('settings')} 
+                className={`flex items-center space-x-3 p-3 rounded-xl transition-all duration-200 ${currentPage === 'settings' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
+              >
+                <SettingsIcon size={24} />
+                <span className="text-lg font-medium">Settings</span>
+              </button>
+            </div>
+            <div className="flex-grow"></div>
+            <div className="p-4">
+              <button
+                onClick={toggleTheme}
+                className="w-full flex items-center justify-center p-2 rounded-full text-gray-400 dark:text-gray-600 hover:text-white dark:hover:text-black transition-colors duration-200"
+              >
+                {theme === 'dark' ? <SunIcon size={24} /> : <MoonIcon size={24} />}
+              </button>
+            </div>
+          </div>
+          
+          {/* Main Content Pane */}
+          <div className="w-full sm:max-w-xl bg-monad-dark-card dark:bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col relative">
+            {/* Header for mobile view */}
+            <div className="sm:hidden p-4 sm:p-6 bg-monad-dark dark:bg-monad-light border-b border-gray-700 dark:border-gray-300 flex justify-between items-center z-20">
+              <h1 className="text-2xl sm:text-3xl font-bold text-monad-purple dark:text-monad-blue">Muxster Social</h1>
               {!walletAddress && (
                 <button
-                  onClick={connectWallet}
-                  className="flex items-center space-x-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors duration-200"
+                  onClick={startRegistration}
+                  className="flex items-center space-x-2 bg-monad-blue hover:bg-monad-purple text-white font-bold py-2 px-4 rounded-full shadow-lg transition-colors duration-200"
                   disabled={isLoading}
                 >
-                  {isLoading ? 'Connecting...' : 'Connect Wallet'}
+                  {isLoading ? 'Loading...' : 'Get Started'}
                 </button>
               )}
             </div>
 
             {/* Main Content Area */}
-            <div className="flex-grow overflow-y-auto pb-16">
+            <div className="flex-grow overflow-y-auto pb-16 sm:pb-0">
               {renderPage()}
             </div>
             
-            {/* Bottom Navigation Menu */}
-            <div className="fixed bottom-0 left-0 right-0 max-w-2xl mx-auto bg-gray-900 border-t border-gray-700 p-2 sm:p-4 rounded-t-3xl flex justify-around shadow-2xl z-20">
+            {/* Mobile Bottom Navigation Menu */}
+            <div className="sm:hidden fixed bottom-0 left-0 right-0 max-w-2xl mx-auto bg-monad-dark dark:bg-monad-light border-t border-gray-700 dark:border-gray-300 p-2 rounded-t-3xl flex justify-around shadow-2xl z-20">
               <button 
                 onClick={() => setCurrentPage('feed')} 
-                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'feed' ? 'text-indigo-400 bg-gray-800' : 'text-gray-500 hover:text-indigo-400'}`}
+                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'feed' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
               >
                 <HomeIcon size={28} />
-                <span className="text-xs font-medium mt-1 hidden sm:block">Timeline</span>
+                <span className="text-xs font-medium mt-1">Timeline</span>
+              </button>
+              <button 
+                onClick={() => setCurrentPage('explore')}
+                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'explore' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
+              >
+                <SearchIcon size={28} />
+                <span className="text-xs font-medium mt-1">Explore</span>
               </button>
               <button 
                 onClick={() => setCurrentPage('launchpad')} 
-                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'launchpad' ? 'text-indigo-400 bg-gray-800' : 'text-gray-500 hover:text-indigo-400'}`}
+                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'launchpad' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
               >
                 <RocketIcon size={28} />
-                <span className="text-xs font-medium mt-1 hidden sm:block">Launchpad</span>
+                <span className="text-xs font-medium mt-1">Launchpad</span>
               </button>
               <button 
                 onClick={() => setCurrentPage('notifications')} 
-                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'notifications' ? 'text-indigo-400 bg-gray-800' : 'text-gray-500 hover:text-indigo-400'}`}
+                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'notifications' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
               >
                 <BellIcon size={28} />
-                <span className="text-xs font-medium mt-1 hidden sm:block">Notifications</span>
+                <span className="text-xs font-medium mt-1">Notifications</span>
               </button>
               <button 
-                onClick={() => setCurrentPage('profile')} 
-                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'profile' ? 'text-indigo-400 bg-gray-800' : 'text-gray-500 hover:text-indigo-400'}`}
+                onClick={() => {
+                  if (walletAddress) {
+                    showProfile(walletAddress);
+                  }
+                }} 
+                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'profile' && currentProfileAddress === walletAddress ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
                 disabled={!walletAddress}
               >
                 <ProfileIcon size={28} />
-                <span className="text-xs font-medium mt-1 hidden sm:block">Profile</span>
+                <span className="text-xs font-medium mt-1">Profile</span>
+              </button>
+              <button 
+                onClick={() => setCurrentPage('settings')} 
+                className={`flex flex-col items-center p-2 rounded-xl transition-all duration-200 ${currentPage === 'settings' ? 'text-monad-purple dark:text-monad-blue bg-gray-800 dark:bg-gray-200' : 'text-gray-500 hover:text-monad-purple dark:hover:text-monad-blue'}`}
+              >
+                <SettingsIcon size={28} />
+                <span className="text-xs font-medium mt-1">Settings</span>
               </button>
             </div>
           </div>
+          {showRegistrationModal && (
+            <RegistrationModal
+              completeRegistration={completeRegistration}
+              isLoading={isLoading}
+              onClose={() => setShowRegistrationModal(false)}
+            />
+          )}
         </div>
       );
     };
